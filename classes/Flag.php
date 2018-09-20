@@ -13,7 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Flag {
 	public $data; // key, title, description, author, ab_label, enforced, enabled
 
-	// CMJ: validation
+	/**
+	* Create a new Flag object
+	* Requires validation
+	*/
 	function __construct( $args ) {
 		$this->data = $args;
 	}
