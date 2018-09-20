@@ -1,8 +1,9 @@
 <?php
 namespace BetaFlags;
-/* Settings page
--------------------------------------------------------- */
-// VIP: Anonymous functions are allowed but are only recommended for small very contained bits of code, for example, a small one-line filter or action hook.
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 class FlagAdmin {
 	public $nonce_name = 'betaflagsnonce';

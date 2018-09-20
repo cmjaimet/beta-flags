@@ -1,6 +1,10 @@
 <?php
 namespace BetaFlags;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 class BetaFlags {
   private static $instance;
 	public $admin_notice = '';

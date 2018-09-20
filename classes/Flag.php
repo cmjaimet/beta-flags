@@ -1,6 +1,10 @@
 <?php
 namespace BetaFlags;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 /**
 * Flag Class
 * Used for creating beta flags.
@@ -9,7 +13,10 @@ namespace BetaFlags;
 class Flag {
 	public $data; // key, title, description, author, ab_label, enforced, enabled
 
-	// CMJ: validation
+	/**
+	* Create a new Flag object
+	* Requires validation
+	*/
 	function __construct( $args ) {
 		$this->data = $args;
 	}
