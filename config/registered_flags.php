@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 pm_betaflag_register(
 	[
-		'key' => 'theme-show-sidebar',
+		'key' => 'theme-npfp-show_sidebar-v100',
 		'title' => 'Show Sidebar',
 		'description' => 'Add a sidebar to the post page',
 		'author' => 'Charles Jaimet',
@@ -15,7 +15,7 @@ pm_betaflag_register(
 );
 pm_betaflag_register(
 	[
-		'key' => 'widget-election-2018',
+		'key' => 'theme-npfp-election_widget-v208',
 		'title' => 'Election Widget',
 		'description' => 'Add a CP widget for the 2018 Saskatchewan election.',
 		'author' => 'Lavanya Singh',
@@ -25,7 +25,7 @@ pm_betaflag_register(
 );
 pm_betaflag_register(
 	[
-		'key' => 'plugin-dfpads-lazyload',
+		'key' => 'plugin-dfpads-lazyload-v103',
 		'title' => 'Lazy Load DFP Ads',
 		'description' => 'Add JavaScript to allow bigbox (mid, bot) to lazy load on scroll',
 		'author' => 'Steve Browning',
@@ -35,7 +35,7 @@ pm_betaflag_register(
 );
 pm_betaflag_register(
 	[
-		'key' => 'plugin-library-wcmpush-terms',
+		'key' => 'plugin-library-wcmpush_terms-v001',
 		'title' => 'Push Terms to WCM (Admin)',
 		'description' => 'Modify Push functionality to send tags and categories to WCM',
 		'author' => 'Sujin Choi',

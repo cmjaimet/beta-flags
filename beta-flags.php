@@ -33,7 +33,8 @@ register_activation_hook( __FILE__, function() {} );
 include_once FF_PLUGIN_PATH . 'classes/BetaFlags.php';
 include_once FF_PLUGIN_PATH . 'classes/Flag.php';
 include_once FF_PLUGIN_PATH . 'classes/Admin.php';
-include_once FF_PLUGIN_PATH . 'config-flags.php';
+
+include_once FF_PLUGIN_PATH . 'config/registered_flags.php';
 
 /**
  * Register a beta flag with the plugin.

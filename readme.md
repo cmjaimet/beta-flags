@@ -8,14 +8,15 @@ Beta Flags can also permit A/B Testing.
 ### Register a flag.
 
 This can be done any time after the 'plugins_loaded' hook fires indicating that plugins are loaded.
-The easiest place to register a beta flag is in this plugin, in the config-flags.php file.
-They can also be registered anywhere in the theme (use functions.php preferably),
-or in a plugin in the method triggered by the 'init' hook.
+There are three 'good' places to register a beta flag:
+	1. In this plugin (config/registered-flags.php)
+	2. In the theme (functions.php)
+	3. In a plugin in the method triggered by the 'init' or 'plugins_loaded' hook
 
 ```php
 pm_betaflag_register(
  [
-	 'key' => 'postmedia-theme-theprovince-widget-election-v101',
+	 'key' => 'theme-theprovince-election_widget-v101',
 	 'title' => 'Election Widget',
 	 'description' => 'Add a widget so we can show the CP election coverage',
 	 'author' => 'Charles Jaimet',
@@ -31,11 +32,11 @@ Only lowercase letters, numbers, hyphens (-), and underscores (_) are allowed.
 Other characters will cause the flag to be blocked.
 
 Follow this pattern for keys:
-[repo slug]-[descriptor]-[version]
+[repo slug (minus 'postmedia')]-[descriptor]-[version]
 e.g.
-'key' => 'postmedia-plugin-layouts-newoutfits-v512'
+'key' => 'plugin-layouts-new_outfits-v512'
 or
-'key' => 'postmedia-theme-theprovince-election_widget-v101'
+'key' => 'theme-theprovince-election_widget-v101'
 
 'title' is what you and others see in the admin to identify this flag. Make it clear and intelligible.
 
@@ -56,13 +57,13 @@ Replace `beta-key` with the key used in the register function to check if it is 
 
 ## Examples
 ```php
-if ( true === pm_betaflag_is_active( 'postmedia-theme-theprovince-election_widget-v101' ) ) {
+if ( true === pm_betaflag_is_active( 'theme-theprovince-election_widget-v101' ) ) {
 	$widget = new ElectionWidget2018();
 }
 ```
 
 ```php
-if ( true === pm_betaflag_is_active( 'postmedia-theme-theprovince-election_widget-v101' ) ) {
+if ( true === pm_betaflag_is_active( 'theme-theprovince-election_widget-v101' ) ) {
 	$widget = new ElectionWidget2018();
 } else {
 	$widget = new ElectionWidget2017();
@@ -71,7 +72,7 @@ if ( true === pm_betaflag_is_active( 'postmedia-theme-theprovince-election_widge
 
 Replace elements in a theme selectively
 ```php
-if ( true === pm_betaflag_is_active( 'postmedia-theme-npfp-logo-v2' ) ) {
+if ( true === pm_betaflag_is_active( 'theme-npfp-logo-v2' ) ) {
 	echo '<img src="images/logo_v2.png" />';
 } else {
 	echo '<img src="images/logo_v1.png" />';
@@ -81,7 +82,7 @@ if ( true === pm_betaflag_is_active( 'postmedia-theme-npfp-logo-v2' ) ) {
 CSS cascades, so later loaded styles override earlier ones
 ```php
 wp_enqueue_style( 'npfp-styles' );
-if ( true === pm_betaflag_is_active( 'postmedia-theme-npfp-reskin-v239' ) ) {
+if ( true === pm_betaflag_is_active( 'theme-npfp-reskin-v239' ) ) {
 	wp_enqueue_style( 'npfp-styles-v239' );
 }
 ```
@@ -92,13 +93,19 @@ function __construct() {
 	add_action( 'init', array( $this, 'init' ) );
 }
 function init() {
-	if ( true === pm_betaflag_is_active( 'postmedia-plugin-layouts-logo-v4' ) ) {
+	if ( true === pm_betaflag_is_active( 'plugin-layouts-logo-v4' ) ) {
 		include_once LAYOUTS_PLUGIN_PATH . 'v4/Layouts.php';
 	} else {
 		include_once LAYOUTS_PLUGIN_PATH . 'v3/Layouts.php';
 	}
 }
 ```
+
+## Screenshots
+1. The admin screen
+2. Registering a flag in this plugin
+3. Registering a flag in a theme
+4. Registering a flag in a plugin
 
 ## Flag states
 enforced: If true then the flag is always on
