@@ -1,6 +1,10 @@
 <?php
 namespace BetaFlags;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 /**
 * Flag Class
 * Used for creating beta flags.
