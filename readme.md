@@ -1,3 +1,16 @@
+How to Use
+1. Write your new code
+2. Register your beta flag
+3. Wrap your new code in the flag conditional
+4. Test!
+5. Deploy your code
+6. Enable your code in the Admin
+
+Best Practices:
+1. Group new code together so a single conditional can enable/disable it
+2. Follow the beta flag key naming convention: [repo_slug]-[descriptor]-[version]
+3. Complete all fields in beta flag definition
+
 # Beta flags for WordPress themes
 
 Add Beta Flags to conceal new code from execution until activated in the admin.
