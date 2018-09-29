@@ -15,7 +15,8 @@ class FlagAdmin {
 	}
 
 	function admin_menu() {
-		add_submenu_page( 'tools.php', 'Beta Flags', 'Beta Flags', 'manage_options', FF_TEXT_DOMAIN, array( $this, 'settings_page' ) );
+		$my_admin_page = add_submenu_page( 'tools.php', 'Beta Flags', 'Beta Flags', 'manage_options', FF_TEXT_DOMAIN, array( $this, 'settings_page' ) );
+		add_action( 'load-' . $my_admin_page, array( $this, 'add_help_tab' ) );
 	}
 
 	/* Plugin styles and scripts
@@ -30,10 +31,14 @@ class FlagAdmin {
 		wp_enqueue_script( 'beta-flags-scripts' );
 	}
 
+	function add_help_tab() {
+		new HelpTab( 'bf_registering', 'Registering', 'registering.html', true );
+		$tab = new HelpTab( 'bf_testing_features', 'Testing Features', 'testing_features.html', true );
+		$tab = new HelpTab( 'bf_ab_testing', 'A/B Testing', 'ab_testing.html', true );
+	}
+
 	function settings_page() {
 		$nonce_value = wp_create_nonce( $this->nonce_name );
-		// $screen = get_current_screen();
-		// print_r( $screen );
 		?>
 		<div class="wrap">
 		<h1><?php esc_html_e( 'Beta Flags', FF_TEXT_DOMAIN ); ?></h1>
