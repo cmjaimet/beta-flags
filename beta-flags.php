@@ -7,7 +7,7 @@
 *
 * @wordpress-plugin
 * Plugin Name:       Beta Flags
-* Description:       Based on Feature Flags by James Williams (https://jamesrwilliams.co.uk/)
+* Description:       Insert beta flags to activate/deactivate new features, and to A/B test them.
 * Version:           1.3.0
 * Author:            Charles Jaimet
 * Author URI:        https://github.com/cmjaimet
@@ -18,44 +18,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-/* Define plugin paths and url for global usage
--------------------------------------------------------- */
 define( 'FF_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'FF_TEXT_DOMAIN', 'beta-flags' );
 
-/* On plugin activation
--------------------------------------------------------- */
-register_activation_hook( __FILE__, function() {} );
-
-/* Includes
--------------------------------------------------------- */
-include_once FF_PLUGIN_PATH . 'classes/HelpTab.php';
 include_once FF_PLUGIN_PATH . 'classes/BetaFlags.php';
-include_once FF_PLUGIN_PATH . 'classes/Flag.php';
 include_once FF_PLUGIN_PATH . 'classes/Admin.php';
 
-include_once FF_PLUGIN_PATH . 'config/registered_flags.php';
+$beta_flags = new \BetaFlags\BetaFlags();
 
-/**
- * Register a beta flag with the plugin.
- *
- * @param [Array] $args
- * @return void
- */
-function pm_betaflag_register( $args ) {
-	\BetaFlags\BetaFlags::init()->add_flag( $args );
-}
-
-function pm_betaflag_is_active( $betaKey = '' ) {
-  return \BetaFlags\BetaFlags::init()->is_active( $betaKey );
-}
-
-add_filter( 'query_vars', 'pm_betaflag_query_vars_filter' );
-function pm_betaflag_query_vars_filter( $vars ) {
-	$flags = \BetaFlags\BetaFlags::init()->flags;
-	foreach ( $flags as $flag ) {
-		$vars[] = $flag->get( 'ab_label' );
-	}
-	return $vars;
+function beta_flag_is_active( $slug ) {
+	global $beta_flags;
+	return $beta_flags->is_active( $slug );
 }
