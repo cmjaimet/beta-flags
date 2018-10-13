@@ -8,8 +8,6 @@ class Admin {
 	function __construct() {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		// add_action( 'wp_ajax_betaFlag_enable', array( $this, 'flag_enable' ) );
-		// add_action( 'wp_ajax_betaTesting_enable', array( $this, 'beta_testing_enable' ) );
 	}
 
 	function admin_menu() {
@@ -23,15 +21,10 @@ class Admin {
 		if ( $hook !== 'tools_page_beta-flags' ) {
 			return;
 		}
-		// wp_register_style( 'beta-flags-styles', FF_PLUGIN_URL . '/assets/beta-flags.css', array(), '1.1.0', false );
-		// wp_enqueue_style( 'beta-flags-styles' );
-		// wp_register_script( 'beta-flags-scripts', FF_PLUGIN_URL . '/assets/beta-flags.js', array(), '1.1.1', false );
-		// wp_enqueue_script( 'beta-flags-scripts' );
 	}
 
 	function settings_page() {
 		global $beta_flags;
-		$this->debug();
 		$this->form_submit();
 		$enable_beta_testing = $beta_flags->flag_settings->ab_test_on;
 		?>
@@ -144,13 +137,6 @@ class Admin {
 		}
 	}
 
-	function debug() {
-		global $beta_flags;
-		echo '<pre>';
-		print_r( $beta_flags->flag_settings );
-		echo '</pre>';
-	}
-
 	function form_validate() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return __( 'You are not authorized to perform that action (E451)', FF_TEXT_DOMAIN );
@@ -159,7 +145,6 @@ class Admin {
 			return __( 'You are not authorized to perform that action (E353)', FF_TEXT_DOMAIN );
 		}
 		$nonce_value = $_POST[ $this->nonce_name ];
-		// $nonce_value = wp_create_nonce( $this->nonce_name );
 		if ( ! wp_verify_nonce( $nonce_value, $this->nonce_name ) ) {
 			return __( 'You are not authorized to perform that action (E314)', FF_TEXT_DOMAIN );
 		}
@@ -183,127 +168,5 @@ class Admin {
 		}
 		return $flag_data->flags;
   }
-
-	// function beta_testing_enable() {
-	// 	$beta_testing_validate = $this->beta_testing_validate();
-	// 	if ( '' !== $beta_testing_validate ) {
-	// 		return __( $beta_testing_validate );
-	// 	}
-	// 	if ( ! isset( $_POST['betaTesting'] ) ) {
-	// 		$enable_beta_testing = 0;
-	// 	}
-	// 	// if checkbox checked then 1, else 0
-	// 	$enable_beta_testing = ( 1 === intval( $_POST['betaTesting'] ) ) ? 1 : 0;
-	// 	update_option( 'enable_beta_testing', $enable_beta_testing );
-	// 	$response = array( 'val' => $enable_beta_testing );
-	// 	header( "Content-Type: application/json" );
-	// 	echo json_encode( $response );
-	// 	exit(); // Don't forget to always exit in the ajax function.
-	// }
-	//
-	// function beta_testing_validate() {
-	// 	if ( ! current_user_can( 'manage_options' ) ) {
-	// 		return __( 'You are not authorized to perform that action (E451)', FF_TEXT_DOMAIN );
-	// 	}
-	// 	if ( isset( $_POST[ $this->nonce_name ] ) ) {
-	// 		$nonce_value = $_POST[ $this->nonce_name ];
-	// 	} else {
-	// 		return __( 'You are not authorized to perform that action (E353)', FF_TEXT_DOMAIN );
-	// 	}
-	// 	if ( ! wp_verify_nonce( $nonce_value, $this->nonce_name ) ) {
-	// 		return __( 'You are not authorized to perform that action (E314)', FF_TEXT_DOMAIN );
-	// 	}
-	// 	return '';
-	// }
-	//
-	// /**
-	//  * AJAX Action toggling betas from the WP admin area.
-	//  */
-	// function flag_enable( $test = false ) {
-	// 	$flag_validate = $this->flag_validate();
-	// 	if ( '' !== $flag_validate ) {
-	// 		return __( $flag_validate );
-	// 	}
-	// 	$response = array();
-	// 	$beta_key = trim( $_POST['betaKey'] );
-  //   $response['key'] = $beta_key;
-  //   $response['state'] = FlagList::init()->toggle_beta( $beta_key );
-	// 	if ( true === $test ) {
-	// 		echo json_encode( $response );
-	// 	} else {
-	// 		header( "Content-Type: application/json" );
-	// 		echo json_encode( $response );
-	// 		exit(); // Don't forget to always exit in the ajax function.
-	// 	}
-	// }
-	/**
-   * Add a new flag to the plugin register.
-   *
-   * @param array $flag
-   * @return void
-   */
-	// function add_flag( $args ) {
-	// 	// get enabled state too
-	// 	$args = $this->add_flag_validate( $args );
-	// 	if ( ! empty( $args['key'] ) ) {
-	// 		$args['enabled'] = ( isset( $this->flag_settings->flags[ $args['key'] ] ) ) ? true : false;
-	// 		$this->flags[] = new Flag( $args );
-	// 	} else {
-	// 		$trace = wp_debug_backtrace_summary( null, 0, false );
-	// 		$trace_flag = array_search( 'register_beta_flag' , $trace, true );
-	// 		$trace_partial = implode( ', ', $trace );
-	// 		if ( false !== $trace_flag ) {
-	// 			$pos = $trace_flag + 1;
-	// 			if ( isset( $trace[ $pos ] ) ) {
-	// 				$trace_partial = $trace[ $pos ];
-	// 			}
-	// 		}
-	// 		$this->admin_notice = ( is_string( $args ) ) ? $args : '';
-	// 		$this->admin_trace = __( 'TRACE: ', FF_TEXT_DOMAIN ) . $trace_partial;
-	// 		add_action( 'admin_notices', array( $this, 'add_flag_notice' ) );
-	// 	}
-	// }
-	// function add_flag_notice()  {
-	// 	$message = __( 'ERROR: ', FF_TEXT_DOMAIN );
-	// 	echo '<div class="notice notice-error"><p>' . esc_html( $message );
-	// 	echo esc_html( $this->admin_notice ) . '<br />';
-	// 	echo esc_html( $this->admin_trace );
-	// 	echo '</p></div>';
-	// }
-	// function add_flag_validate( $args ) {
-	// 	$defaults = array(
-	// 		'title' => __( 'No Name', FF_TEXT_DOMAIN ),
-	// 		'key' => '',
-	// 		'ab_test' => false,
-	//     'enforced' => false,
-	// 		'description' => '',
-	// 		'author' => '',
-	//   );
-	//   $args = wp_parse_args( $args, $defaults );
-	// 	// key must be unique
-	// 	if ( $this->is_key_duplicate( $args['key'] ) ) {
-	// 		return __( 'Key exists already', FF_TEXT_DOMAIN );
-	// 	}
-	// 	if ( preg_replace( "/[a-z0-9\-\_]+/", '', $args['key'] ) !== '' ) {
-	// 		return __( 'Key can only contain lowercase letter, numbers, hyphens, and underscores', FF_TEXT_DOMAIN );
-	// 	}
-	// 	if ( '' === $args['key'] ) {
-	// 		return __( 'You must supply a key', FF_TEXT_DOMAIN );
-	// 	}
-	// 	if ( '' === trim( $args['title'] ) ) {
-	// 		$args['title'] = __( 'No Name', FF_TEXT_DOMAIN );
-	// 	}
-	// 	// whitelabel boolean
-	// 	$args['ab_test'] = ( true === $args['ab_test'] ) ? true : false;
-	// 	$args['enforced'] = ( true === $args['enforced'] ) ? true : false;
-	// 	return $args;
-	// }
-	// function is_key_duplicate( $key ) {
-	// 	$key = trim( $key );
-	// 	$key_exists = ( false === $this->find_flag( $key ) ) ? false : true;
-	// 	return $key_exists;
-	// }
-
-
 
 }
