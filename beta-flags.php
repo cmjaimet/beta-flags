@@ -22,23 +22,21 @@ define( 'FF_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'FF_TEXT_DOMAIN', 'beta-flags' );
 
-include_once FF_PLUGIN_PATH . 'classes/FlagList.php';
-include_once FF_PLUGIN_PATH . 'classes/Flag.php';
+// include_once FF_PLUGIN_PATH . 'classes/FlagList.php';
+// include_once FF_PLUGIN_PATH . 'classes/Flag.php';
 include_once FF_PLUGIN_PATH . 'classes/Admin.php';
-
 
 class BetaFlags {
 	public $flaglist;
 	public static $ab_key = 'ab';
 	public static $enable_beta_testing = 0;
+	public $flag_settings;
 
 	function __construct() {
-		global $beta_flags;
-		add_filter( 'query_vars', array( $this, 'query_vars_filter' ) );
+		$this->flag_settings = get_option( FF_TEXT_DOMAIN, null );
 		new BetaFlags\Admin();
-		$beta_flags = new BetaFlags\FlagList();
-	 	$this->flaglist = $beta_flags;
-		self::$enable_beta_testing = intval( get_option( 'enable_beta_testing', 0 ) );
+		self::$enable_beta_testing = $this->flag_settings->ab_test_on;
+		add_filter( 'query_vars', array( $this, 'query_vars_filter' ) );
 		add_action( 'init', array( $this, 'init' ) );
 	}
 
@@ -46,6 +44,19 @@ class BetaFlags {
 		add_filter( 'post_link', array( $this, 'abtest_query_string' ), 10, 3 );
 		add_filter( 'term_link', array( $this, 'abtest_query_string' ), 10, 3 );
 	}
+
+	function find_flag( $key ) {
+		return $this->flag_settings->flags[ $key ];
+  }
+
+	function is_active( $flag_key ) {
+    $flag = $this->find_flag( $flag_key );
+		if ( false !== $flag ) {
+			return ( 1 === intval( $flag['active'] ) ) ? true : false;
+		} else {
+			return true; // if the flag doesn't exist then don't let it block code execution
+		}
+  }
 
 	function abtest_query_string( $url, $post, $leavename=false ) {
 		if ( 1 === self::$enable_beta_testing ) {
@@ -62,7 +73,7 @@ class BetaFlags {
 	}
 
 }
-new BetaFlags();
+$beta_flags = new BetaFlags();
 
 function beta_flag_is_active( $slug ) {
 	global $beta_flags;
