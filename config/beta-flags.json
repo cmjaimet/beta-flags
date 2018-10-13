@@ -1,0 +1,28 @@
+{
+	"flags": [
+		{
+			"key": "theme-npfp-show_sidebar-v444",
+			"title": "Beta Flags QA: Theme Web Test",
+			"description": "Add a sidebar to the post page",
+			"author": "Charles Jaimet",
+			"ab_label": "ab",
+			"enforced": false
+		},
+		{
+			"key": "plugin-library-admin_test_v002",
+			"title": "Beta Flags QA: Plugin Admin Test",
+			"description": "For Beta Flag testing: ",
+			"author": "Charles Jaimet",
+			"ab_label": "ab",
+			"enforced": false
+		},
+		{
+			"key": "plugin-library-web_test_v001",
+			"title": "Beta Flags QA: Plugin Web Test",
+			"description": "For Beta Flag testing: ",
+			"author": "Charles Jaimet",
+			"ab_label": "absb",
+			"enforced": true
+		}
+	]
+}

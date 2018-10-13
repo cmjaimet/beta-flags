@@ -1,11 +1,7 @@
 <?php
 namespace BetaFlags;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
-
-class BetaFlags {
+class FlagList {
   private static $instance;
 	public $admin_notice = '';
 	public $admin_trace = '';
@@ -24,16 +20,72 @@ class BetaFlags {
   }
 
 	function __construct() {
-		$this->flag_settings = $this->get_flag_settings();
+		$this->get_flags();
+	}
+
+	function is_key_duplicate( $key ) {
+		$key = trim( $key );
+		$key_exists = ( false === $this->find_flag( $key ) ) ? false : true;
+		return $key_exists;
 	}
 
   /**
+   * Retrieve the flag object of a specified key.
+   *
+   * @param string $key
+   * @return void
+   */
+  function find_flag( $key ) {
+    $flag = false;
+    $flags = $this->flags;
+    foreach( $flags as $struct ) {
+      if ( $key === $struct->data['key'] ) {
+        $flag = $struct;
+        break;
+      }
+    }
+    return $flag;
+  }
+
+	/**
+   * Get and register beta flags from JSON in the theme (fallback to plugin)
+	 * need to validate the JSON and unit test properly
+	 * cache this? option/transient?
+   *
+   * @return string|void All available flags if $enforced is false, else only returns 'enforced' betas.
+   */
+  function get_flags() {
+		$this->flag_settings = $this->get_flag_settings();
+		$flags = [];
+		if ( empty( $flags ) ) {
+			$flag_json = file_get_contents( get_template_directory() . '/beta-flags.json' );
+			if ( false === $flag_json ) {
+				$flag_json = file_get_contents( FF_PLUGIN_PATH . 'config/beta-flags.json' );
+			}
+			if ( false === $flag_json ) {
+				return;
+			}
+			$flag_data = json_decode( $flag_json );
+			if ( is_null( $flag_data ) ) {
+				return;
+			}
+			if ( ! isset( $flag_data->flags ) ) {
+				return;
+			}
+			foreach ( $flag_data->flags as $flag ) {
+				$this->add_flag( $flag );
+			}
+		}
+  }
+
+	/**
    * Add a new flag to the plugin register.
    *
    * @param array $flag
    * @return void
    */
 	function add_flag( $args ) {
+		// get enabled state too
 		$args = $this->add_flag_validate( $args );
 		if ( ! empty( $args['key'] ) ) {
 			$args['enabled'] = ( isset( $this->flag_settings[ $args['key'] ] ) ) ? true : false;
@@ -66,7 +118,7 @@ class BetaFlags {
 		$defaults = array(
 			'title' => __( 'No Name', FF_TEXT_DOMAIN ),
 			'key' => '',
-			'ab_label' => '',
+			'ab_test' => false,
 	    'enforced' => false,
 			'description' => '',
 			'author' => '',
@@ -82,48 +134,22 @@ class BetaFlags {
 		if ( '' === $args['key'] ) {
 			return __( 'You must supply a key', FF_TEXT_DOMAIN );
 		}
-		if ( preg_replace( "/[a-z0-9\-\_]+/", '', $args['ab_label'] ) !== '' ) {
-			return __( 'A/B Labels can only contain lowercase letter, numbers, hyphens, and underscores', FF_TEXT_DOMAIN );
-		}
 		if ( '' === trim( $args['title'] ) ) {
 			$args['title'] = __( 'No Name', FF_TEXT_DOMAIN );
 		}
 		// whitelabel boolean
+		$args['ab_test'] = ( true === $args['ab_test'] ) ? true : false;
 		$args['enforced'] = ( true === $args['enforced'] ) ? true : false;
 		return $args;
 	}
 
-	function is_key_duplicate( $key ) {
-		$key = trim( $key );
-		$key_exists = ( false === $this->find_flag( $key ) ) ? false : true;
-		return $key_exists;
-	}
-
-  /**
-   * Retrieve the flag object of a specified key.
-   *
-   * @param string $key
-   * @return void
-   */
-  function find_flag( $key ) {
-    $flag = false;
-    $flags = $this->flags;
-    foreach( $flags as $struct ) {
-      if ( $key === $struct->data['key'] ) {
-        $flag = $struct;
-        break;
-      }
-    }
-    return $flag;
-  }
-
-  /**
+	/**
    * Undocumented function
    *
    * @param boolean $enforced
    * @return string|void All available flags if $enforced is false, else only returns 'enforced' betas.
    */
-  function get_flags( $enforced = false ) {
+  function list_flags( $enforced = false ) {
     $flags = $this->flags;
     if ( $enforced ) {
       $filteredFlags = array_filter( $flags, function( $value ) {
@@ -176,7 +202,5 @@ class BetaFlags {
 	function get_flag_settings() {
     return get_option( FF_TEXT_DOMAIN, null );
   }
-
-	// two sets of data: registered flags, flags on/off
 
 }

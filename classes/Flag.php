@@ -1,10 +1,6 @@
 <?php
 namespace BetaFlags;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
-
 /**
 * Flag Class
 * Used for creating beta flags.
@@ -56,7 +52,7 @@ class Flag {
 	* @return bool Flag is active/not
 	*/
   function is_ab_active() {
-		$ab_label = $this->get( 'ab_label' );
+		$ab_label = \BetaFlags::$ab_key;
 		$ab_value = get_query_var( $ab_label, null );
 		if ( is_null( $ab_value ) ) {
 			return true; // ALLOW: flag enabled and no A/B test parameter in query string so allow access to the beta

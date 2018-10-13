@@ -1,3 +1,11 @@
+Registry JSON should be in theme, fallback to plugin
+$flag_json = file_get_contents( get_template_directory() . '/beta-flags.json' );
+$flag_json = file_get_contents( FF_PLUGIN_PATH . 'config/beta-flags.json' );
+
+A/B test by hooking permalink
+
+# Version 1.3.0
+# Author Charles Jaimet @cmjaimet
 How to Use
 1. Write your new code
 2. Register your beta flag
@@ -19,10 +27,7 @@ Beta Flags can also permit A/B Testing.
 ## Usage
 
 ### Register a flag.
-
-This can be done any time after the 'plugins_loaded' hook fires indicating that plugins are loaded.
-There are three 'good' places to register a beta flag:
-	1. In this plugin (config/registered-flags.php)
+Add your flag to this plugin (configuration/beta-flags.json)
 	2. In the theme (functions.php)
 	3. In a plugin in the method triggered by the 'init' or 'plugins_loaded' hook
 

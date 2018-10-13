@@ -1,22 +1,18 @@
 <?php
 namespace BetaFlags;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
-
-class FlagAdmin {
+class Admin {
 	public $nonce_name = 'betaflagsnonce';
 
 	function __construct() {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'wp_ajax_betaFlag_enable', array( $this, 'flag_enable' ) );
+		add_action( 'wp_ajax_betaTesting_enable', array( $this, 'beta_testing_enable' ) );
 	}
 
 	function admin_menu() {
-		$my_admin_page = add_submenu_page( 'tools.php', 'Beta Flags', 'Beta Flags', 'manage_options', FF_TEXT_DOMAIN, array( $this, 'settings_page' ) );
-		add_action( 'load-' . $my_admin_page, array( $this, 'add_help_tab' ) );
+		add_submenu_page( 'tools.php', 'Beta Flags', 'Beta Flags', 'manage_options', FF_TEXT_DOMAIN, array( $this, 'settings_page' ) );
 	}
 
 	/* Plugin styles and scripts
@@ -27,18 +23,13 @@ class FlagAdmin {
 		}
 		wp_register_style( 'beta-flags-styles', FF_PLUGIN_URL . '/assets/beta-flags.css', array(), '1.1.0', false );
 		wp_enqueue_style( 'beta-flags-styles' );
-		wp_register_script( 'beta-flags-scripts', FF_PLUGIN_URL . '/assets/beta-flags.js', array(), '1.1.0', false );
+		wp_register_script( 'beta-flags-scripts', FF_PLUGIN_URL . '/assets/beta-flags.js', array(), '1.1.1', false );
 		wp_enqueue_script( 'beta-flags-scripts' );
-	}
-
-	function add_help_tab() {
-		new HelpTab( 'bf_registering', 'Registering', 'registering.html', true );
-		$tab = new HelpTab( 'bf_testing_features', 'Testing Features', 'testing_features.html', true );
-		$tab = new HelpTab( 'bf_ab_testing', 'A/B Testing', 'ab_testing.html', true );
 	}
 
 	function settings_page() {
 		$nonce_value = wp_create_nonce( $this->nonce_name );
+		$enable_beta_testing = \BetaFlags::$enable_beta_testing;
 		?>
 		<div class="wrap">
 		<h1><?php esc_html_e( 'Beta Flags', FF_TEXT_DOMAIN ); ?></h1>
@@ -48,25 +39,29 @@ class FlagAdmin {
 		<?php
 		$this->list_flags(
 			false,
-			'Available beta flags',
-			'Beta flags or toggles allow betas to easily be enabled for users to test in a more realistic environment.'
+			__( 'Available beta flags', FF_TEXT_DOMAIN ),
+			__( 'Beta flags or toggles allow betas to easily be enabled for users to test in a more realistic environment.', FF_TEXT_DOMAIN )
 		);
 		$this->list_flags(
 			true,
-			'Enforced beta flags',
-			'Betas listed below are currently configured to be enforced by default by the developers. These are flags that will be removed from the website code soon.'
+			__( 'Enforced beta flags', FF_TEXT_DOMAIN ),
+			__( 'Betas listed below are currently configured to be enforced by default by the developers. These are flags that will be removed from the website code soon.', FF_TEXT_DOMAIN )
 		);
 		?>
+		<p>
+		<input type="checkbox" id="betaTesting" value="1" <?php echo checked( $enable_beta_testing, 1, true ); ?> />
+		<?php esc_html_e( 'Enable beta testing', FF_TEXT_DOMAIN ); ?>
+		</p>
 		</div>
 		<?php
 	}
 
 	function list_flags( $enforced = true, $title = '', $description = '' ) {
-		$flags = BetaFlags::init()->get_flags( $enforced );
+		$flags = FlagList::init()->list_flags( $enforced );
 		if ( isset( $flags ) ) {
 			?>
-			<h2><?php esc_html_e( $title, FF_TEXT_DOMAIN ); ?></h2>
-			<p><?php esc_html_e( $description, FF_TEXT_DOMAIN ); ?></p>
+			<h2><?php esc_html( $title ); ?></h2>
+			<p><?php esc_html( $description ); ?></p>
 			<table class="widefat">
 			<thead>
 			<tr>
@@ -74,7 +69,7 @@ class FlagAdmin {
 			<th class="row-title"><?php esc_html_e( 'Beta', FF_TEXT_DOMAIN ); ?></th>
 			<th><?php esc_html_e( 'Key', FF_TEXT_DOMAIN ); ?></th>
 			<th><?php esc_html_e( 'Author', FF_TEXT_DOMAIN ); ?></th>
-			<th><?php esc_html_e( 'A/B Label', FF_TEXT_DOMAIN ); ?></th>
+			<th><?php esc_html_e( 'A/B Test', FF_TEXT_DOMAIN ); ?></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -89,7 +84,7 @@ class FlagAdmin {
 				<td class="row-title"><?php echo esc_html( $flag->get( 'title' ) ); ?></td>
 				<td><pre><?php echo esc_attr( $flag_key ); ?></pre></td>
 				<td><?php echo esc_html( $flag->get( 'author' ) ); ?></td>
-				<td><?php echo esc_html( $flag->get( 'ab_label' ) ); ?></td>
+				<td><?php echo ( true === $flag->get( 'ab_test' ) ? 'true' : '--' ); ?></td>
 				</td>
 				</tr>
 				<tr class="<?php echo esc_attr( $class ); ?>">
@@ -117,6 +112,38 @@ class FlagAdmin {
 		<?php
 	}
 
+	function beta_testing_enable() {
+		$beta_testing_validate = $this->beta_testing_validate();
+		if ( '' !== $beta_testing_validate ) {
+			return __( $beta_testing_validate );
+		}
+		if ( ! isset( $_POST['betaTesting'] ) ) {
+			$enable_beta_testing = 0;
+		}
+		// if checkbox checked then 1, else 0
+		$enable_beta_testing = ( 1 === intval( $_POST['betaTesting'] ) ) ? 1 : 0;
+		update_option( 'enable_beta_testing', $enable_beta_testing );
+		$response = array( 'val' => $enable_beta_testing );
+		header( "Content-Type: application/json" );
+		echo json_encode( $response );
+		exit(); // Don't forget to always exit in the ajax function.
+	}
+
+	function beta_testing_validate() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return __( 'You are not authorized to perform that action (E451)', FF_TEXT_DOMAIN );
+		}
+		if ( isset( $_POST[ $this->nonce_name ] ) ) {
+			$nonce_value = $_POST[ $this->nonce_name ];
+		} else {
+			return __( 'You are not authorized to perform that action (E353)', FF_TEXT_DOMAIN );
+		}
+		if ( ! wp_verify_nonce( $nonce_value, $this->nonce_name ) ) {
+			return __( 'You are not authorized to perform that action (E314)', FF_TEXT_DOMAIN );
+		}
+		return '';
+	}
+
 	/**
 	 * AJAX Action toggling betas from the WP admin area.
 	 */
@@ -128,7 +155,7 @@ class FlagAdmin {
 		$response = array();
 		$beta_key = trim( $_POST['betaKey'] );
     $response['key'] = $beta_key;
-    $response['state'] = BetaFlags::init()->toggle_beta( $beta_key );
+    $response['state'] = FlagList::init()->toggle_beta( $beta_key );
 		if ( true === $test ) {
 			echo json_encode( $response );
 		} else {
@@ -160,5 +187,3 @@ class FlagAdmin {
 	}
 
 }
-
-new FlagAdmin();
