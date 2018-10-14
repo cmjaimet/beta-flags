@@ -1,6 +1,6 @@
 # Beta Flags ... now with A/B Testing!
 **Version:** 1.3.0<br />
-**Author:** Charles Jaimet @cmjaimet
+**Author:** Charles Jaimet @cmjaimet<br />
 **Thanks to:** James Williams, whose plugin inspired this one
 (https://github.com/jamesrwilliams/feature-flags)
 
