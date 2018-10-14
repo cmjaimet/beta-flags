@@ -62,19 +62,17 @@ class Admin {
 		<tbody>
 		<?php
 		foreach ( $this->flag_data as $key => $flag ) {
-			$flag_key = $flag->key;
-			$enabled = $beta_flags->flag_settings->flags[ $flag_key ]['active'];
-			$ab_test = $beta_flags->flag_settings->flags[ $flag_key ]['ab_test'];
+			$enabled = $beta_flags->flag_settings->flags[ $key ]['enabled'];
+			$ab_test = $beta_flags->flag_settings->flags[ $key ]['ab_test'];
 			$class = ( $key % 2 == 0 ? 'alternate' : '' );
 			?>
-			<input type="hidden" name="flags[<?php echo esc_attr( $flag_key ); ?>][exists]" value="1" />
+			<input type="hidden" name="flags[<?php echo esc_attr( $key ); ?>][exists]" value="1" />
 			<tr class="<?php echo esc_attr( $class ); ?>">
-			<td><input type="checkbox" name="flags[<?php echo esc_attr( $flag_key ); ?>][active]" value="1" <?php checked( $enabled, 1, false ); ?> /></td>
-			<?php $this->show_flag_icon( $flag_key, $enabled ); ?></td>
+			<td><input type="checkbox" name="flags[<?php echo esc_attr( $key ); ?>][enabled]" value="1" <?php checked( $enabled, 1, true ); ?> /></td>
 			<td><?php echo esc_html( $flag->title ); ?></td>
-			<td><?php echo esc_attr( $flag_key ); ?></td>
+			<td><?php echo esc_attr( $key ); ?></td>
 			<td><?php echo esc_html( $flag->author ); ?></td>
-			<td><input type="checkbox" name="flags[<?php echo esc_attr( $flag_key ); ?>][ab_test]" value="1" <?php checked( $ab_test, 1, true ); ?> /></td>
+			<td><input type="checkbox" name="flags[<?php echo esc_attr( $key ); ?>][ab_test]" value="1" <?php checked( $ab_test, 1, true ); ?> /></td>
 			</td>
 			</tr>
 			<tr class="<?php echo esc_attr( $class ); ?>">
@@ -103,7 +101,7 @@ class Admin {
 			if ( isset( $_POST['flags'] ) ) {
 				foreach ( $_POST['flags'] as $key => $val ) {
 					$settings->flags[ trim( $key ) ] = array(
-						'active' => ( isset( $val['active'] ) ? 1 : 0 ),
+						'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
 						'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 )
 					);
 				}
