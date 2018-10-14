@@ -4,23 +4,16 @@ namespace BetaFlags;
 class Admin {
 	public $nonce_name = 'betaflagsnonce';
 	private $flag_data = array();
+	private $beta_flags;
 
 	function __construct() {
+		global $beta_flags;
+		$this->beta_flags = $beta_flags;
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
 
 	function admin_menu() {
 		add_submenu_page( 'tools.php', 'Beta Flags', 'Beta Flags', 'manage_options', FF_TEXT_DOMAIN, array( $this, 'settings_page' ) );
-	}
-
-	/**
-	* Plugin styles and scripts
-	*/
-	function enqueue_scripts( $hook ) {
-		if ( $hook !== 'tools_page_beta-flags' ) {
-			return;
-		}
 	}
 
 	function settings_page() {
@@ -37,14 +30,8 @@ class Admin {
 		wp_nonce_field( $this->nonce_name, $this->nonce_name, true, true );
 		$this->flag_data = $this->get_flag_data();
 		$this->list_flags(
-			0,
 			__( 'Available beta flags', FF_TEXT_DOMAIN ),
 			__( 'Beta flags or toggles allow betas to easily be enabled for users to test in a more realistic environment.', FF_TEXT_DOMAIN )
-		);
-		$this->list_flags(
-			1,
-			__( 'Enforced beta flags', FF_TEXT_DOMAIN ),
-			__( 'Betas listed below are currently configured to be enforced by default by the developers. These are flags that will be removed from the website code soon.', FF_TEXT_DOMAIN )
 		);
 		?>
 		<p>
@@ -57,7 +44,7 @@ class Admin {
 		<?php
 	}
 
-	function list_flags( $enforced = 1, $title = '', $description = '' ) {
+	function list_flags( $title = '', $description = '' ) {
 		global $beta_flags;
 		?>
 		<h2><?php esc_html( $title ); ?></h2>
@@ -75,42 +62,31 @@ class Admin {
 		<tbody>
 		<?php
 		foreach ( $this->flag_data as $key => $flag ) {
-			if ( $flag->enforced === $enforced ) {
-				$flag_key = $flag->key;
-				$enabled = $beta_flags->flag_settings->flags[ $flag_key ]['active'];
-				$ab_test = $beta_flags->flag_settings->flags[ $flag_key ]['ab_test'];
-				$class = ( $key % 2 == 0 ? 'alternate' : '' );
-				?>
-				<input type="hidden" name="flags[<?php echo esc_attr( $flag_key ); ?>][exists]" value="1" />
-				<tr class="<?php echo esc_attr( $class ); ?>">
-				<td><?php $this->show_flag_icon( $flag_key, $enforced, $enabled ); ?></td>
-				<td><?php echo esc_html( $flag->title ); ?></td>
-				<td><?php echo esc_attr( $flag_key ); ?></td>
-				<td><?php echo esc_html( $flag->author ); ?></td>
-				<td><input type="checkbox" name="flags[<?php echo esc_attr( $flag_key ); ?>][ab_test]" value="1" <?php checked( $ab_test, 1, true ); ?> /></td>
-				</td>
-				</tr>
-				<tr class="<?php echo esc_attr( $class ); ?>">
-				<td></td>
-				<td colspan="4"><?php echo esc_html( $flag->description ); ?></td>
-				</tr>
-				<?php
-			}
+			$flag_key = $flag->key;
+			$enabled = $beta_flags->flag_settings->flags[ $flag_key ]['active'];
+			$ab_test = $beta_flags->flag_settings->flags[ $flag_key ]['ab_test'];
+			$class = ( $key % 2 == 0 ? 'alternate' : '' );
+			?>
+			<input type="hidden" name="flags[<?php echo esc_attr( $flag_key ); ?>][exists]" value="1" />
+			<tr class="<?php echo esc_attr( $class ); ?>">
+			<td><input type="checkbox" name="flags[<?php echo esc_attr( $flag_key ); ?>][active]" value="1" <?php checked( $enabled, 1, false ); ?> /></td>
+			<?php $this->show_flag_icon( $flag_key, $enabled ); ?></td>
+			<td><?php echo esc_html( $flag->title ); ?></td>
+			<td><?php echo esc_attr( $flag_key ); ?></td>
+			<td><?php echo esc_html( $flag->author ); ?></td>
+			<td><input type="checkbox" name="flags[<?php echo esc_attr( $flag_key ); ?>][ab_test]" value="1" <?php checked( $ab_test, 1, true ); ?> /></td>
+			</td>
+			</tr>
+			<tr class="<?php echo esc_attr( $class ); ?>">
+			<td></td>
+			<td colspan="4"><?php echo esc_html( $flag->description ); ?></td>
+			</tr>
+			<?php
 		}
 		?>
 		</tbody>
 		</table>
 		<?php
-	}
-
-	function show_flag_icon( $flag_key, $enforced, $enabled ) {
-		$class = '';
-		if ( 1 === $enforced ) {
-			echo '&#9745;';
-			echo '<input type="hidden" name="flags[' . esc_attr( $flag_key ) . '][active]" value="1" checked="checked" />';
-		} else {
-			echo '<input type="checkbox" name="flags[' . esc_attr( $flag_key ) . '][active]" value="1" ' . checked( $enabled, 1, false ) . ' />';
-		}
 	}
 
 	function form_submit() {

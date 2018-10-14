@@ -26,6 +26,7 @@ include_once FF_PLUGIN_PATH . 'classes/BetaFlags.php';
 include_once FF_PLUGIN_PATH . 'classes/Admin.php';
 
 $beta_flags = new \BetaFlags\BetaFlags();
+new \BetaFlags\Admin();
 
 function beta_flag_is_active( $slug ) {
 	global $beta_flags;

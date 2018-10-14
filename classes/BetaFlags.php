@@ -8,7 +8,6 @@ class BetaFlags {
 
 	function __construct() {
 		$this->flag_settings = get_option( FF_TEXT_DOMAIN, null );
-		new Admin();
 		add_filter( 'query_vars', array( $this, 'query_vars_filter' ) );
 		add_action( 'init', array( $this, 'init' ) );
 	}
