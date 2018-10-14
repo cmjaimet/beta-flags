@@ -8,7 +8,6 @@ class BetaFlags {
 
 	function __construct() {
 		$this->flag_settings = get_option( FF_TEXT_DOMAIN, null );
-		new Admin();
 		add_filter( 'query_vars', array( $this, 'query_vars_filter' ) );
 		add_action( 'init', array( $this, 'init' ) );
 	}
@@ -18,18 +17,26 @@ class BetaFlags {
 		add_filter( 'term_link', array( $this, 'abtest_query_string' ), 10, 3 );
 	}
 
-	function find_flag( $key ) {
-		return $this->flag_settings->flags[ $key ];
-  }
-
-	function is_active( $flag_key ) {
-    $flag = $this->find_flag( $flag_key );
-		if ( false !== $flag ) {
-			return ( 1 === intval( $flag['active'] ) ) ? true : false;
-		} else {
+	function is_enabled( $flag_key ) {
+    $flag = $this->flag_settings->flags[ $flag_key ];
+		if ( false === $flag ) {
 			return true; // if the flag doesn't exist then don't let it block code execution
 		}
+		if ( 1 === intval( $flag['enabled'] ) ) {
+			return $this->is_ab_active(); // flag is enabled so check A/B test status
+		} else {
+			return true; // flag is disabled in admin
+		}
   }
+
+	function is_ab_active() {
+		$ab_value = get_query_var( $this->ab_key, null );
+		if ( is_null( $ab_value ) ) {
+			return true; // ALLOW: flag enabled and no A/B test parameter in query string so allow access to the beta
+		} else {
+			return false; // BLOCK: flag enabled but A/B test parameter exists in query string so block access to the beta
+		}
+	}
 
 	function abtest_query_string( $url, $post, $leavename=false ) {
 		if ( 1 === $this->flag_settings->ab_test_on ) {

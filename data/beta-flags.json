@@ -1,28 +1,19 @@
 {
-	"flags": [
-		{
-			"key": "theme-npfp-show_sidebar-v444",
-			"title": "Beta Flags QA: Theme Web Test",
+	"flags": {
+		"sidebar_web": {
+			"title": "Beta Flags IN THEME",
 			"description": "Add a sidebar to the post page",
-			"author": "Charles Jaimet",
-			"ab_label": "ab",
-			"enforced": false
+			"author": "Charles Jaimet"
 		},
-		{
-			"key": "plugin-library-admin_test_v002",
+		"library_admin": {
 			"title": "Beta Flags QA: Plugin Admin Test",
-			"description": "For Beta Flag testing: ",
-			"author": "Charles Jaimet",
-			"ab_label": "ab",
-			"enforced": false
+			"description": "For Beta Flag testing in admin interface",
+			"author": "Charles Jaimet"
 		},
-		{
-			"key": "plugin-library-web_test_v001",
+		"library_web": {
 			"title": "Beta Flags QA: Plugin Web Test",
-			"description": "For Beta Flag testing: ",
-			"author": "Charles Jaimet",
-			"ab_label": "absb",
-			"enforced": true
+			"description": "For Beta Flag testing web ",
+			"author": "Charles Jaimet"
 		}
-	]
+	}
 }
