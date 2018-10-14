@@ -70,7 +70,7 @@ if ( beta_flag_enabled( 'revised_sticky_video_for_youtube_widgets_v.1.0.5' ) ) {
 
 ## A/B Testing
 
-Now you have your beta flags and you've embedded them in your code. The feature works as expected and you have it running on production. Is it better than what it replaced?
+Now you have your beta flags and you've embedded them in your code. Your fancy new feature works as expected and you have it running on production. Nice work, but is it better than what it replaced?
 
 Enter A/B testing.
 
