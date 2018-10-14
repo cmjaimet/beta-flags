@@ -17,9 +17,13 @@ class Admin {
 	}
 
 	function settings_page() {
-		global $beta_flags;
-		$this->form_submit();
-		$enable_beta_testing = $beta_flags->flag_settings->ab_test_on;
+		$message = $this->form_submit();
+		$enable_beta_testing = $this->beta_flags->flag_settings->ab_test_on;
+		if ( '' !== $message ) {
+			?>
+			<div id="message" class="updated fade"><?php echo esc_html( $message ); ?></div>
+			<?php
+		}
 		?>
 		<div class="wrap">
 		<form method="post" action="/wp-admin/tools.php?page=beta-flags">
@@ -45,7 +49,6 @@ class Admin {
 	}
 
 	function list_flags( $title = '', $description = '' ) {
-		global $beta_flags;
 		?>
 		<h2><?php esc_html( $title ); ?></h2>
 		<p><?php esc_html( $description ); ?></p>
@@ -61,10 +64,11 @@ class Admin {
 		</thead>
 		<tbody>
 		<?php
+		$count = 0;
 		foreach ( $this->flag_data as $key => $flag ) {
-			$enabled = $beta_flags->flag_settings->flags[ $key ]['enabled'];
-			$ab_test = $beta_flags->flag_settings->flags[ $key ]['ab_test'];
-			$class = ( $key % 2 == 0 ? 'alternate' : '' );
+			$enabled = $this->beta_flags->flag_settings->flags[ $key ]['enabled'];
+			$ab_test = $this->beta_flags->flag_settings->flags[ $key ]['ab_test'];
+			$class = ( $count % 2 == 0 ? 'alternate' : '' );
 			?>
 			<input type="hidden" name="flags[<?php echo esc_attr( $key ); ?>][exists]" value="1" />
 			<tr class="<?php echo esc_attr( $class ); ?>">
@@ -80,6 +84,7 @@ class Admin {
 			<td colspan="4"><?php echo esc_html( $flag->description ); ?></td>
 			</tr>
 			<?php
+			$count ++;
 		}
 		?>
 		</tbody>
@@ -88,12 +93,11 @@ class Admin {
 	}
 
 	function form_submit() {
-		global $beta_flags;
+		$message = '';
 		if ( isset( $_POST["submit"] ) ) {
 			$message = $this->form_validate();
 			if ( '' !== $message ) {
-				echo '<p>' . esc_html( $message ) . '</p>';
-				return false;
+				return $message;
 			}
 			$settings = new \stdClass;
 			$settings->ab_test_on = isset( $_POST['ab_test_on'] ) ? 1 : 0;
@@ -107,8 +111,10 @@ class Admin {
 				}
 			}
 			update_option( FF_TEXT_DOMAIN, $settings );
-			$beta_flags->flag_settings = $settings;
+			$this->beta_flags->flag_settings = $settings;
+			$message = 'Beta flags successfully updated';
 		}
+		return $message;
 	}
 
 	function form_validate() {
