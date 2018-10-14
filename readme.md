@@ -1,3 +1,7 @@
+When add a new beta flag in JSON is is automatically disabled
+Remove old conditionals when beta flags removed or they will block code
+
+
 Registry JSON should be in theme, fallback to plugin
 $flag_json = file_get_contents( get_template_directory() . '/beta-flags.json' );
 $flag_json = file_get_contents( FF_PLUGIN_PATH . 'config/beta-flags.json' );
