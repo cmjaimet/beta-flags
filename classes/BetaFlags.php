@@ -25,7 +25,7 @@ class BetaFlags {
 		if ( 1 === intval( $flag['enabled'] ) ) {
 			return $this->is_ab_active(); // flag is enabled so check A/B test status
 		} else {
-			return true; // flag is disabled in admin
+			return false; // flag is disabled in admin
 		}
   }
 
