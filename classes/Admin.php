@@ -128,27 +128,27 @@ class Admin {
 	*/
 	function form_submit() {
 		$message = '';
-		if ( isset( $_POST["submit"] ) ) {
-			$message = $this->form_validate();
-			if ( '' !== $message ) {
-				return $message;
-			}
-			$settings = new \stdClass;
-			$settings->ab_test_on = isset( $_POST['ab_test_on'] ) ? 1 : 0;
-			$settings->flags = array();
-			if ( isset( $_POST['flags'] ) ) {
-				foreach ( $_POST['flags'] as $flag_key => $val ) {
-					$settings->flags[ trim( $flag_key ) ] = array(
-						'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
-						'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 )
-					);
-				}
-			}
-			update_option( FF_TEXT_DOMAIN, $settings );
-			$this->beta_flags->flag_settings = $settings;
-			$message = __( 'Beta flags successfully updated', FF_TEXT_DOMAIN );
+		if ( ! isset( $_POST['submit'] ) ) {
+			return __( 'Beta flags failed to update', FF_TEXT_DOMAIN );
 		}
-		return $message;
+		$message = $this->form_validate();
+		if ( '' !== $message ) {
+			return __( 'Beta flags failed to validate', FF_TEXT_DOMAIN );
+		}
+		$settings = new \stdClass;
+		$settings->ab_test_on = isset( $_POST['ab_test_on'] ) ? 1 : 0;
+		$settings->flags = array();
+		if ( isset( $_POST['flags'] ) ) {
+			foreach ( $_POST['flags'] as $flag_key => $val ) {
+				$settings->flags[ trim( $flag_key ) ] = array(
+					'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
+					'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 )
+				);
+			}
+		}
+		update_option( FF_TEXT_DOMAIN, $settings );
+		$this->beta_flags->flag_settings = $settings;
+		return __( 'Beta flags successfully updated', FF_TEXT_DOMAIN );
 	}
 
 	/**
