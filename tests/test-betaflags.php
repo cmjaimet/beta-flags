@@ -102,7 +102,7 @@ class TestBetaFlags extends \WP_UnitTestCase {
 			'ab_test' => 0,
 		);
 		$settings->flags['bad_data'] = array();
-		update_option( FF_TEXT_DOMAIN, $settings );
+		update_option( 'beta-flags', $settings );
 	}
 
 }
