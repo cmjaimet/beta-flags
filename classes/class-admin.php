@@ -128,19 +128,23 @@ class Admin {
 	* @return string Success or failure message on save process
 	*/
 	function form_submit() {
-		$message = '';
 		if ( ! isset( $_POST['submit'] ) ) {
-			return __( 'Beta flags failed to update', 'beta-flags' );
+			return '';
 		}
-		$message = $this->form_validate();
-		if ( '' !== $message ) {
-			return __( 'Beta flags failed to validate', 'beta-flags' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return __( 'You are not authorized to perform that action (E451)', 'beta-flags' );
+		}
+		if ( isset( $_POST[ $this->nonce_name ] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ $this->nonce_name ] ) ), $this->nonce_name ) ) {
+			return __( 'You are not authorized to perform that action (E314)', 'beta-flags' );
+		}
+		if ( ! isset( $_POST[ $this->nonce_name ] ) ) {
+			return __( 'You are not authorized to perform that action (E353)', 'beta-flags' );
 		}
 		$settings = new \stdClass;
 		$settings->ab_test_on = isset( $_POST['ab_test_on'] ) ? 1 : 0;
 		$settings->flags = array();
 		if ( isset( $_POST['flags'] ) ) {
-			foreach ( $_POST['flags'] as $flag_key => $val ) {
+			foreach ( wp_unslash( $_POST['flags'] ) as $flag_key => $val ) {
 				$settings->flags[ trim( $flag_key ) ] = array(
 					'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
 					'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 ),
@@ -150,25 +154,6 @@ class Admin {
 		update_option( $this->domain, $settings );
 		$this->beta_flags->flag_settings = $settings;
 		return __( 'Beta flags successfully updated', 'beta-flags' );
-	}
-
-	/**
-	* Validate form submission: permission and nonce
-	*
-	* @return string Error message or blank on success
-	*/
-	function form_validate() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return __( 'You are not authorized to perform that action (E451)', 'beta-flags' );
-		}
-		if ( ! isset( $_POST[ $this->nonce_name ] ) ) {
-			return __( 'You are not authorized to perform that action (E353)', 'beta-flags' );
-		}
-		$nonce_value = wp_unslash( sanitize_text_field( $_POST[ $this->nonce_name ] ) );
-		if ( ! wp_verify_nonce( $nonce_value, $this->nonce_name ) ) {
-			return __( 'You are not authorized to perform that action (E314)', 'beta-flags' );
-		}
-		return '';
 	}
 
 	/**
