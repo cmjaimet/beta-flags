@@ -70,7 +70,7 @@ class Admin {
 		<table class="widefat">
 		<thead>
 		<tr>
-		<th><?php esc_html_e( 'Active', FF_TEXT_DOMAIN ); ?></th>
+		<th><?php esc_html_e( 'Enabled', FF_TEXT_DOMAIN ); ?></th>
 		<th><?php esc_html_e( 'Title', FF_TEXT_DOMAIN ); ?></th>
 		<th><?php esc_html_e( 'Key', FF_TEXT_DOMAIN ); ?></th>
 		<th><?php esc_html_e( 'Author', FF_TEXT_DOMAIN ); ?></th>
@@ -176,9 +176,14 @@ class Admin {
 	* @return string|object Returns error message if no config file found or file does not contain valid JSON
 	*/
 	function get_flag_data() {
-		$flag_json = file_get_contents( get_template_directory() . '/beta-flags.json' );
-		if ( false === $flag_json ) {
-			$flag_json = file_get_contents( FF_PLUGIN_PATH . 'config/beta-flags.json' );
+		$json_file = get_template_directory() . '/beta-flags.json';
+		if ( file_exists ( $json_file ) ) {
+			$flag_json = file_get_contents( $json_file );
+		} else {
+			$json_file = FF_PLUGIN_PATH . 'data/beta-flags.json';
+			if ( file_exists ( $json_file ) ) {
+				$flag_json = file_get_contents( $json_file );
+			}
 		}
 		if ( false === $flag_json ) {
 			return __( 'No configuration file found', FF_PLUGIN_PATH );

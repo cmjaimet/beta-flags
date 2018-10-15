@@ -85,7 +85,7 @@ class BetaFlags {
 	*
 	* @return string The revised URL with or without the A/B Testing query string
 	*/
-	function abtest_term_link( $url, $post, $taxonomy ) {
+	function abtest_term_link( $url, $term, $taxonomy ) {
 		return $this->abtest_query_string( $url );
 	}
 
