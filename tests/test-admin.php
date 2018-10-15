@@ -79,7 +79,7 @@ class TestAdmin extends \WP_UnitTestCase {
 		$this->assertEquals( $settings->flags['test_two']['ab_test'], 1 );
 	}
 
-	function x	test_form_validate() {
+	function xtest_form_validate() {
 		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E353)' );
 		$_POST['betaflagsnonce'] = 'baddata';
 		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E314)' );
