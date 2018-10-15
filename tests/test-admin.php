@@ -53,7 +53,30 @@ class TestAdmin extends \WP_UnitTestCase {
 	}
 
 	function test_form_submit() {
-		$this->assertTrue( true ); // placeholder to prevent PHPUnit warnings until test written
+		$_POST = array();
+		$_POST['ab_test_on'] = '1';
+		$_POST['flags'] = array();
+		$_POST['flags']['test_one'] = array(
+			'enabled' => '1'
+		);
+		$_POST['flags']['test_two'] = array(
+			'ab_test' => '1'
+		);
+		$result = $this->admin->form_submit();
+		$this->assertEquals( 'Beta flags failed to update', $result );
+		$_POST['submit'] = 'Save';
+		$result = $this->admin->form_submit();
+		$this->assertEquals( 'Beta flags failed to validate', $result );
+		$nonce_value = wp_create_nonce( 'betaflagsnonce' );
+		$_POST['betaflagsnonce'] = $nonce_value;
+		$result = $this->admin->form_submit();
+		$settings = get_option( FF_TEXT_DOMAIN );
+		$this->assertEquals( 'Beta flags successfully updated', $result );
+		$this->assertEquals( $settings->ab_test_on, 1 );
+		$this->assertEquals( $settings->flags['test_one']['enabled'], 1 );
+		$this->assertEquals( $settings->flags['test_one']['ab_test'], 0 );
+		$this->assertEquals( $settings->flags['test_two']['enabled'], 0 );
+		$this->assertEquals( $settings->flags['test_two']['ab_test'], 1 );
 	}
 
 	function test_form_validate() {
@@ -62,7 +85,7 @@ class TestAdmin extends \WP_UnitTestCase {
 		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E314)' );
 		$nonce_value = wp_create_nonce( 'betaflagsnonce' );
 		$_POST[ 'betaflagsnonce' ] = $nonce_value;
-		$this->assertEquals( $this->admin->form_validate(), '' );
+		$this->assertEquals( '', $this->admin->form_validate() );
 		$user_id = $this->make_user( 'author' );
 		wp_set_current_user( $user_id );
 		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E451)' );
@@ -71,26 +94,30 @@ class TestAdmin extends \WP_UnitTestCase {
 	function test_get_flag_data() {
 		$flag_data = $this->admin->get_flag_data();
 		$this->assertEquals( 'Fred Page', $flag_data->redesign_v109->author );
-		// $json_plugin = FF_PLUGIN_PATH . 'data/beta-flags.json';
-		// $json_theme = get_template_directory() . '/beta-flags.json';
+		$file_plugin = FF_PLUGIN_PATH . 'data/beta-flags.json';
+		$file_theme = get_template_directory() . '/beta-flags.json';
 		// create a file in theme
-		// copy( $json_plugin, $json_theme );
-		// $flag_data = $this->admin->get_flag_data();
-		// $this->assertEquals( 'Fred Page', $flag_data->redesign_v109->author );
-		// $json_text = file_get_contents( $json_theme );
-		// $json_text = str_replace( '"Fred Page"', '"Allison Page"', $json_text );
-		// file_put_contents( $json_theme, $json_text );
-		// $flag_data = $this->admin->get_flag_data();
-		// $this->assertEquals( 'Allison Page', $flag_data->redesign_v109->author );
+		copy( $file_plugin, $file_theme );
+		$flag_data = $this->admin->get_flag_data();
+		$this->assertEquals( 'Fred Page', $flag_data->redesign_v109->author );
 		// alter file in theme
-		// $json_text = str_replace( '"Allison Page"', '"Allison Page",', $json_text );
-		// file_put_contents( $json_theme, $json_text );
-		// $flag_data = $this->admin->get_flag_data();
-		// $this->assertEquals( 'Configuration file does not contain valid JSON', $flag_data );
+		$json_text = file_get_contents( $file_theme );
+		$json_text = str_replace( '"Fred Page"', '"Allison Page"', $json_text );
+		file_put_contents( $file_theme, $json_text );
+		$flag_data = $this->admin->get_flag_data();
+		$this->assertEquals( 'Allison Page', $flag_data->redesign_v109->author );
+		// alter file in theme to remove flags
+		$json_text = str_replace( '"flags": {', '"flask": {', $json_text );
+		file_put_contents( $file_theme, $json_text );
+		$flag_data = $this->admin->get_flag_data();
+		$this->assertEquals( 'No beta flag data found in configuration file', $flag_data );
+		// alter file in theme to invalid JSON
+		$json_text = str_replace( '"Allison Page"', '"Allison Page",', $json_text );
+		file_put_contents( $file_theme, $json_text );
+		$flag_data = $this->admin->get_flag_data();
+		$this->assertEquals( 'Configuration file does not contain valid JSON', $flag_data );
 		// delete file in theme
-		// alter file in plugin
-		// delete file in plugin
-		// delete file in plugin
+		unlink( $file_theme );
 	}
 
 	function tearDown() {
