@@ -57,10 +57,10 @@ class TestAdmin extends \WP_UnitTestCase {
 		$_POST['ab_test_on'] = '1';
 		$_POST['flags'] = array();
 		$_POST['flags']['test_one'] = array(
-			'enabled' => '1'
+			'enabled' => '1',
 		);
 		$_POST['flags']['test_two'] = array(
-			'ab_test' => '1'
+			'ab_test' => '1',
 		);
 		$result = $this->admin->form_submit();
 		$this->assertEquals( 'Beta flags failed to update', $result );
@@ -81,10 +81,10 @@ class TestAdmin extends \WP_UnitTestCase {
 
 	function test_form_validate() {
 		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E353)' );
-		$_POST[ 'betaflagsnonce' ] = 'baddata';
+		$_POST['betaflagsnonce'] = 'baddata';
 		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E314)' );
 		$nonce_value = wp_create_nonce( 'betaflagsnonce' );
-		$_POST[ 'betaflagsnonce' ] = $nonce_value;
+		$_POST['betaflagsnonce'] = $nonce_value;
 		$this->assertEquals( '', $this->admin->form_validate() );
 		$user_id = $this->make_user( 'author' );
 		wp_set_current_user( $user_id );
@@ -101,7 +101,7 @@ class TestAdmin extends \WP_UnitTestCase {
 		$flag_data = $this->admin->get_flag_data();
 		$this->assertEquals( 'Fred Page', $flag_data->redesign_v109->author );
 		// alter file in theme
-		$json_text = file_get_contents( $file_theme );
+		$json_text = wpcom_vip_file_get_contents( $file_theme );
 		$json_text = str_replace( '"Fred Page"', '"Allison Page"', $json_text );
 		file_put_contents( $file_theme, $json_text );
 		$flag_data = $this->admin->get_flag_data();
@@ -127,8 +127,8 @@ class TestAdmin extends \WP_UnitTestCase {
 
 	private function make_user( $role ) {
 		$user_id = $this->factory->user->create( array(
-        'role' => $role,
-    ) );
+			'role' => $role,
+		) );
 		return $user_id;
 	}
 
@@ -138,11 +138,11 @@ class TestAdmin extends \WP_UnitTestCase {
 		$settings->flags = array();
 		$settings->flags['new_sidebar'] = array(
 			'enabled' => 1,
-			'ab_test' => 0
+			'ab_test' => 0,
 		);
 		$settings->flags['sticky_video'] = array(
 			'enabled' => 0,
-			'ab_test' => 0
+			'ab_test' => 0,
 		);
 		update_option( FF_TEXT_DOMAIN, $settings );
 	}

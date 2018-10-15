@@ -20,10 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'FF_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'FF_TEXT_DOMAIN', 'beta-flags' );
 
-include_once FF_PLUGIN_PATH . 'classes/BetaFlags.php';
-include_once FF_PLUGIN_PATH . 'classes/Admin.php';
+include_once FF_PLUGIN_PATH . 'classes/class-betaflags.php';
+include_once FF_PLUGIN_PATH . 'classes/class-admin.php';
 
 $beta_flags = new \BetaFlags\BetaFlags();
 new \BetaFlags\Admin();

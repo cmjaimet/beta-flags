@@ -31,7 +31,7 @@ The JSON file follows the format below:
 
 Each flag is defined by a key (e.g. sidebar_web, library_admin), representing an object with a title, description, and author. The key must be unique, and is used throughout to identify the given flag.
 
-Once you have activated the plugin (there are no special instructions for this), navigate to Tools > Beta Flags in the admin interface (`/wp-admin/tools.php?page=beta-flags`). Here you will the flags from your JSON file if you have created it correctly.
+Once you have activated the plugin (there are no special instructions for this), navigate to Tools > Beta Flags in the admin interface (`/wp-admin/tools.php?page=beta-flags`). Here you will find the flags from your JSON file if you have created it correctly.
 
 A note about JSON, the easiest mistake to make is to put a comma after the last element in an array or object. This will break the JSON but is easy enough to fix when you know what to look for. Kinda like forgetting a semi-colon in PHP. Stupid semi-colons...
 

@@ -41,7 +41,7 @@ class BetaFlags {
 		} else {
 			return false; // flag is disabled in admin
 		}
-  }
+	}
 
 	/**
 	* Determine from the A/B testing status the flag state for enabled flags
@@ -97,7 +97,7 @@ class BetaFlags {
 	*/
 	function abtest_query_string( $url ) {
 		if ( 1 === $this->flag_settings->ab_test_on ) {
-			if ( 1 === rand( 0, 1 ) ) {
+			if ( 1 === wp_rand( 0, 1 ) ) {
 				$url = add_query_arg( $this->ab_key, '1', $url );
 			}
 		}
