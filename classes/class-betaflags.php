@@ -7,7 +7,7 @@ class BetaFlags {
 	public $flag_settings;
 
 	function __construct() {
-		$this->flag_settings = get_option( FF_TEXT_DOMAIN, null );
+		$this->flag_settings = get_option( 'beta-flags', null );
 		add_filter( 'query_vars', array( $this, 'query_vars_filter' ) );
 		add_action( 'init', array( $this, 'init' ) );
 	}
