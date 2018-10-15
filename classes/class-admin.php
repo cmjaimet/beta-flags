@@ -29,7 +29,7 @@ class Admin {
 	*/
 	function settings_page() {
 		?>
-		<h1><?php esc_html_e( 'Beta Flags', $this->domain ); ?></h1>
+		<h1><?php esc_html_e( 'Beta Flags', 'beta-flags' ); ?></h1>
 		<hr>
 		<?php
 		$flag_data = $this->get_flag_data();
@@ -53,7 +53,7 @@ class Admin {
 		?>
 		<p>
 		<input type="checkbox" name="ab_test_on" value="1" <?php echo checked( $enable_beta_testing, 1, true ); ?> />
-		<?php esc_html_e( 'Enable beta testing', $this->domain ); ?>
+		<?php esc_html_e( 'Enable beta testing', 'beta-flags' ); ?>
 		</p>
 		<?php submit_button(); ?>
 		</form>
@@ -71,11 +71,11 @@ class Admin {
 		<table class="widefat">
 		<thead>
 		<tr>
-		<th><?php esc_html_e( 'Enabled', $this->domain ); ?></th>
-		<th><?php esc_html_e( 'Title', $this->domain ); ?></th>
-		<th><?php esc_html_e( 'Key', $this->domain ); ?></th>
-		<th><?php esc_html_e( 'Author', $this->domain ); ?></th>
-		<th><?php esc_html_e( 'A/B Test', $this->domain ); ?></th>
+		<th><?php esc_html_e( 'Enabled', 'beta-flags' ); ?></th>
+		<th><?php esc_html_e( 'Title', 'beta-flags' ); ?></th>
+		<th><?php esc_html_e( 'Key', 'beta-flags' ); ?></th>
+		<th><?php esc_html_e( 'Author', 'beta-flags' ); ?></th>
+		<th><?php esc_html_e( 'A/B Test', 'beta-flags' ); ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -84,7 +84,7 @@ class Admin {
 		foreach ( $this->flag_data as $flag_key => $flag ) {
 			$enabled = $this->get_flag_setting( $flag_key, 'enabled' );
 			$ab_test = $this->get_flag_setting( $flag_key, 'ab_test' );
-			$class = ( $count % 2 == 0 ? 'alternate' : '' );
+			$class = ( 0 === $count % 2 ? 'alternate' : '' );
 			?>
 			<input type="hidden" name="flags[<?php echo esc_attr( $flag_key ); ?>][exists]" value="1" />
 			<tr class="<?php echo esc_attr( $class ); ?>">
@@ -130,11 +130,11 @@ class Admin {
 	function form_submit() {
 		$message = '';
 		if ( ! isset( $_POST['submit'] ) ) {
-			return __( 'Beta flags failed to update', $this->domain );
+			return __( 'Beta flags failed to update', 'beta-flags' );
 		}
 		$message = $this->form_validate();
 		if ( '' !== $message ) {
-			return __( 'Beta flags failed to validate', $this->domain );
+			return __( 'Beta flags failed to validate', 'beta-flags' );
 		}
 		$settings = new \stdClass;
 		$settings->ab_test_on = isset( $_POST['ab_test_on'] ) ? 1 : 0;
@@ -143,13 +143,13 @@ class Admin {
 			foreach ( $_POST['flags'] as $flag_key => $val ) {
 				$settings->flags[ trim( $flag_key ) ] = array(
 					'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
-					'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 )
+					'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 ),
 				);
 			}
 		}
 		update_option( $this->domain, $settings );
 		$this->beta_flags->flag_settings = $settings;
-		return __( 'Beta flags successfully updated', $this->domain );
+		return __( 'Beta flags successfully updated', 'beta-flags' );
 	}
 
 	/**
@@ -159,14 +159,14 @@ class Admin {
 	*/
 	function form_validate() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return __( 'You are not authorized to perform that action (E451)', $this->domain );
+			return __( 'You are not authorized to perform that action (E451)', 'beta-flags' );
 		}
 		if ( ! isset( $_POST[ $this->nonce_name ] ) ) {
-			return __( 'You are not authorized to perform that action (E353)', $this->domain );
+			return __( 'You are not authorized to perform that action (E353)', 'beta-flags' );
 		}
-		$nonce_value = $_POST[ $this->nonce_name ];
+		$nonce_value = wp_unslash( sanitize_text_field( $_POST[ $this->nonce_name ] ) );
 		if ( ! wp_verify_nonce( $nonce_value, $this->nonce_name ) ) {
-			return __( 'You are not authorized to perform that action (E314)', $this->domain );
+			return __( 'You are not authorized to perform that action (E314)', 'beta-flags' );
 		}
 		return '';
 	}
@@ -178,23 +178,23 @@ class Admin {
 	*/
 	function get_flag_data() {
 		$json_file = get_template_directory() . '/beta-flags.json';
-		if ( file_exists ( $json_file ) ) {
+		if ( file_exists( $json_file ) ) {
 			$flag_json = wpcom_vip_file_get_contents( $json_file );
 		} else {
 			$json_file = FF_PLUGIN_PATH . 'data/beta-flags.json';
-			if ( file_exists ( $json_file ) ) {
+			if ( file_exists( $json_file ) ) {
 				$flag_json = wpcom_vip_file_get_contents( $json_file );
 			}
 		}
 		if ( false === $flag_json ) {
-			return __( 'No configuration file found', FF_PLUGIN_PATH );
+			return __( 'No configuration file found', 'beta-flags' );
 		}
 		$flag_data = json_decode( $flag_json );
 		if ( is_null( $flag_data ) ) {
-			return __( 'Configuration file does not contain valid JSON', FF_PLUGIN_PATH );
+			return __( 'Configuration file does not contain valid JSON', 'beta-flags' );
 		}
 		if ( ! isset( $flag_data->flags ) ) {
-			return __( 'No beta flag data found in configuration file', FF_PLUGIN_PATH );
+			return __( 'No beta flag data found in configuration file', 'beta-flags' );
 		}
 		return $flag_data->flags;
 	}
