@@ -87,22 +87,21 @@ class TestBetaFlags extends \WP_UnitTestCase {
 		$settings->flags = array();
 		$settings->flags['fullsized_ads'] = array(
 			'enabled' => 1,
-			'ab_test' => 1
+			'ab_test' => 1,
 		);
 		$settings->flags['new_sidebar'] = array(
 			'enabled' => 1,
-			'ab_test' => 0
+			'ab_test' => 0,
 		);
 		$settings->flags['sticky_video'] = array(
 			'enabled' => 0,
-			'ab_test' => 1
+			'ab_test' => 1,
 		);
 		$settings->flags['redesign_v109'] = array(
 			'enabled' => 0,
-			'ab_test' => 0
+			'ab_test' => 0,
 		);
-		$settings->flags['bad_data'] = array(
-		);
+		$settings->flags['bad_data'] = array();
 		update_option( FF_TEXT_DOMAIN, $settings );
 	}
 

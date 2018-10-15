@@ -5,6 +5,7 @@ class Admin {
 	public $nonce_name = 'betaflagsnonce';
 	private $flag_data = array();
 	private $beta_flags;
+	private $domain = 'beta-flags';
 
 	function __construct() {
 		global $beta_flags;
@@ -18,7 +19,7 @@ class Admin {
 	* @return null
 	*/
 	function admin_menu() {
-		add_submenu_page( 'tools.php', 'Beta Flags', 'Beta Flags', 'manage_options', FF_TEXT_DOMAIN, array( $this, 'settings_page' ) );
+		add_submenu_page( 'tools.php', 'Beta Flags', 'Beta Flags', 'manage_options', $this->domain, array( $this, 'settings_page' ) );
 	}
 
 	/**
@@ -28,7 +29,7 @@ class Admin {
 	*/
 	function settings_page() {
 		?>
-		<h1><?php esc_html_e( 'Beta Flags', FF_TEXT_DOMAIN ); ?></h1>
+		<h1><?php esc_html_e( 'Beta Flags', $this->domain ); ?></h1>
 		<hr>
 		<?php
 		$flag_data = $this->get_flag_data();
@@ -52,7 +53,7 @@ class Admin {
 		?>
 		<p>
 		<input type="checkbox" name="ab_test_on" value="1" <?php echo checked( $enable_beta_testing, 1, true ); ?> />
-		<?php esc_html_e( 'Enable beta testing', FF_TEXT_DOMAIN ); ?>
+		<?php esc_html_e( 'Enable beta testing', $this->domain ); ?>
 		</p>
 		<?php submit_button(); ?>
 		</form>
@@ -70,11 +71,11 @@ class Admin {
 		<table class="widefat">
 		<thead>
 		<tr>
-		<th><?php esc_html_e( 'Enabled', FF_TEXT_DOMAIN ); ?></th>
-		<th><?php esc_html_e( 'Title', FF_TEXT_DOMAIN ); ?></th>
-		<th><?php esc_html_e( 'Key', FF_TEXT_DOMAIN ); ?></th>
-		<th><?php esc_html_e( 'Author', FF_TEXT_DOMAIN ); ?></th>
-		<th><?php esc_html_e( 'A/B Test', FF_TEXT_DOMAIN ); ?></th>
+		<th><?php esc_html_e( 'Enabled', $this->domain ); ?></th>
+		<th><?php esc_html_e( 'Title', $this->domain ); ?></th>
+		<th><?php esc_html_e( 'Key', $this->domain ); ?></th>
+		<th><?php esc_html_e( 'Author', $this->domain ); ?></th>
+		<th><?php esc_html_e( 'A/B Test', $this->domain ); ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -129,11 +130,11 @@ class Admin {
 	function form_submit() {
 		$message = '';
 		if ( ! isset( $_POST['submit'] ) ) {
-			return __( 'Beta flags failed to update', FF_TEXT_DOMAIN );
+			return __( 'Beta flags failed to update', $this->domain );
 		}
 		$message = $this->form_validate();
 		if ( '' !== $message ) {
-			return __( 'Beta flags failed to validate', FF_TEXT_DOMAIN );
+			return __( 'Beta flags failed to validate', $this->domain );
 		}
 		$settings = new \stdClass;
 		$settings->ab_test_on = isset( $_POST['ab_test_on'] ) ? 1 : 0;
@@ -146,9 +147,9 @@ class Admin {
 				);
 			}
 		}
-		update_option( FF_TEXT_DOMAIN, $settings );
+		update_option( $this->domain, $settings );
 		$this->beta_flags->flag_settings = $settings;
-		return __( 'Beta flags successfully updated', FF_TEXT_DOMAIN );
+		return __( 'Beta flags successfully updated', $this->domain );
 	}
 
 	/**
@@ -158,14 +159,14 @@ class Admin {
 	*/
 	function form_validate() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return __( 'You are not authorized to perform that action (E451)', FF_TEXT_DOMAIN );
+			return __( 'You are not authorized to perform that action (E451)', $this->domain );
 		}
 		if ( ! isset( $_POST[ $this->nonce_name ] ) ) {
-			return __( 'You are not authorized to perform that action (E353)', FF_TEXT_DOMAIN );
+			return __( 'You are not authorized to perform that action (E353)', $this->domain );
 		}
 		$nonce_value = $_POST[ $this->nonce_name ];
 		if ( ! wp_verify_nonce( $nonce_value, $this->nonce_name ) ) {
-			return __( 'You are not authorized to perform that action (E314)', FF_TEXT_DOMAIN );
+			return __( 'You are not authorized to perform that action (E314)', $this->domain );
 		}
 		return '';
 	}
@@ -178,11 +179,11 @@ class Admin {
 	function get_flag_data() {
 		$json_file = get_template_directory() . '/beta-flags.json';
 		if ( file_exists ( $json_file ) ) {
-			$flag_json = file_get_contents( $json_file );
+			$flag_json = wpcom_vip_file_get_contents( $json_file );
 		} else {
 			$json_file = FF_PLUGIN_PATH . 'data/beta-flags.json';
 			if ( file_exists ( $json_file ) ) {
-				$flag_json = file_get_contents( $json_file );
+				$flag_json = wpcom_vip_file_get_contents( $json_file );
 			}
 		}
 		if ( false === $flag_json ) {
@@ -196,6 +197,6 @@ class Admin {
 			return __( 'No beta flag data found in configuration file', FF_PLUGIN_PATH );
 		}
 		return $flag_data->flags;
-  }
+	}
 
 }
