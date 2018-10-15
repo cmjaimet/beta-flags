@@ -144,8 +144,9 @@ class Admin {
 		$settings->ab_test_on = isset( $_POST['ab_test_on'] ) ? 1 : 0;
 		$settings->flags = array();
 		if ( isset( $_POST['flags'] ) ) {
-			foreach ( wp_unslash( $_POST['flags'] ) as $flag_key => $val ) {
-				$settings->flags[ trim( $flag_key ) ] = array(
+			$flags = wp_unslash( $_POST['flags'] );
+			foreach ( $flags as $flag_key => $val ) {
+				$settings->flags[ sanitize_text_field( $flag_key ) ] = array(
 					'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
 					'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 ),
 				);

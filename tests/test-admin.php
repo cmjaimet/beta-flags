@@ -22,7 +22,7 @@ class TestAdmin extends \WP_UnitTestCase {
 
 	function test_admin_menu() {
 		$this->admin->admin_menu();
-		$this->assertNotEmpty( menu_page_url( FF_TEXT_DOMAIN, false ) );
+		$this->assertNotEmpty( menu_page_url( 'beta-flags', false ) );
 	}
 
 	function test_settings_page() {
@@ -63,14 +63,14 @@ class TestAdmin extends \WP_UnitTestCase {
 			'ab_test' => '1',
 		);
 		$result = $this->admin->form_submit();
-		$this->assertEquals( 'Beta flags failed to update', $result );
+		$this->assertEquals( '', $result );
 		$_POST['submit'] = 'Save';
 		$result = $this->admin->form_submit();
-		$this->assertEquals( 'Beta flags failed to validate', $result );
+		$this->assertEquals( 'You are not authorized to perform that action (E353)', $result );
 		$nonce_value = wp_create_nonce( 'betaflagsnonce' );
 		$_POST['betaflagsnonce'] = $nonce_value;
 		$result = $this->admin->form_submit();
-		$settings = get_option( FF_TEXT_DOMAIN );
+		$settings = get_option( 'beta-flags' );
 		$this->assertEquals( 'Beta flags successfully updated', $result );
 		$this->assertEquals( $settings->ab_test_on, 1 );
 		$this->assertEquals( $settings->flags['test_one']['enabled'], 1 );
@@ -79,16 +79,17 @@ class TestAdmin extends \WP_UnitTestCase {
 		$this->assertEquals( $settings->flags['test_two']['ab_test'], 1 );
 	}
 
-	function x	test_form_validate() {
-		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E353)' );
+	function test_form_validate() {
+		$_POST['submit'] = 'Save';
+		$this->assertEquals( $this->admin->form_submit(), 'You are not authorized to perform that action (E353)' );
 		$_POST['betaflagsnonce'] = 'baddata';
-		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E314)' );
+		$this->assertEquals( $this->admin->form_submit(), 'You are not authorized to perform that action (E314)' );
 		$nonce_value = wp_create_nonce( 'betaflagsnonce' );
 		$_POST['betaflagsnonce'] = $nonce_value;
-		$this->assertEquals( '', $this->admin->form_validate() );
+		$this->assertEquals( 'Beta flags successfully updated', $this->admin->form_submit() );
 		$user_id = $this->make_user( 'author' );
 		wp_set_current_user( $user_id );
-		$this->assertEquals( $this->admin->form_validate(), 'You are not authorized to perform that action (E451)' );
+		$this->assertEquals( $this->admin->form_submit(), 'You are not authorized to perform that action (E451)' );
 	}
 
 	function test_get_flag_data() {
@@ -144,7 +145,7 @@ class TestAdmin extends \WP_UnitTestCase {
 			'enabled' => 0,
 			'ab_test' => 0,
 		);
-		update_option( FF_TEXT_DOMAIN, $settings );
+		update_option( 'beta-flags', $settings );
 	}
 
 }

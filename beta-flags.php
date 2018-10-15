@@ -32,8 +32,8 @@ function beta_flag_enabled( $slug ) {
 	return $beta_flags->is_enabled( $slug );
 }
 
-if ( ! function_exists( 'wpcom_vip_file_get_contents') ) {
+if ( ! function_exists( 'wpcom_vip_file_get_contents' ) ) {
 	function wpcom_vip_file_get_contents( $path ) {
-		return file_get_contents( $path );
+		return file_get_contents( $path ); // @codingStandardsIgnoreLine replaces VIP helper function where not available
 	}
 }
