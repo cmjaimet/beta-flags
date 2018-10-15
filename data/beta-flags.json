@@ -1,19 +1,19 @@
 {
 	"flags": {
-		"sidebar_web": {
-			"title": "Beta Flags IN THEME",
-			"description": "Add a sidebar to the post page",
+		"new_sidebar": {
+			"title": "New sidebar",
+			"description": "Add a 300px-wide sidebar to the post page",
 			"author": "Charles Jaimet"
 		},
-		"library_admin": {
-			"title": "Beta Flags QA: Plugin Admin Test",
-			"description": "For Beta Flag testing in admin interface",
+		"sticky_video": {
+			"title": "Sticky video in featured slot",
+			"description": "Lets video collapse to thumbnail on scroll past",
 			"author": "Charles Jaimet"
 		},
-		"library_web": {
-			"title": "Beta Flags QA: Plugin Web Test",
-			"description": "For Beta Flag testing web ",
-			"author": "Charles Jaimet"
+		"redesign_v109": {
+			"title": "Redesign v.1.0.9",
+			"description": "New CSS using Material Design to make the site look mor Googlish",
+			"author": "Fred Page"
 		}
 	}
 }
