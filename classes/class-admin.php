@@ -8,8 +8,8 @@ class Admin {
 	private $domain = 'beta-flags';
 
 	function __construct() {
-		global $beta_flags;
-		$this->beta_flags = $beta_flags;
+		global $beta_flags_object;
+		$this->beta_flags = $beta_flags_object;
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 	}
 
@@ -169,7 +169,7 @@ class Admin {
 		if ( file_exists( $json_file ) ) {
 			$flag_json = $this->file_get_contents( $json_file );
 		} else {
-			$json_file = FF_PLUGIN_PATH . 'data/beta-flags.json';
+			$json_file = BETA_FLAGS_PLUGIN_PATH . 'data/beta-flags.json';
 			if ( file_exists( $json_file ) ) {
 				$flag_json = $this->file_get_contents( $json_file );
 			}
