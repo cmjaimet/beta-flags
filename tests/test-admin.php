@@ -102,7 +102,7 @@ class TestAdmin extends \WP_UnitTestCase {
 		$flag_data = $this->admin->get_flag_data();
 		$this->assertEquals( 'Fred Page', $flag_data->redesign_v109->author );
 		// alter file in theme
-		$json_text = wpcom_vip_file_get_contents( $file_theme );
+		$json_text = file_get_contents( $file_theme );
 		$json_text = str_replace( '"Fred Page"', '"Allison Page"', $json_text );
 		file_put_contents( $file_theme, $json_text );
 		$flag_data = $this->admin->get_flag_data();

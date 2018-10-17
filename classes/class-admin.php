@@ -8,8 +8,8 @@ class Admin {
 	private $domain = 'beta-flags';
 
 	function __construct() {
-		global $beta_flags;
-		$this->beta_flags = $beta_flags;
+		global $beta_flags_object;
+		$this->beta_flags = $beta_flags_object;
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 	}
 
@@ -145,11 +145,13 @@ class Admin {
 		$settings->flags = array();
 		if ( isset( $_POST['flags'] ) ) {
 			$flags = wp_unslash( $_POST['flags'] );
-			foreach ( $flags as $flag_key => $val ) {
-				$settings->flags[ sanitize_text_field( $flag_key ) ] = array(
-					'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
-					'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 ),
-				);
+			if ( is_array( $flags ) ) {
+				foreach ( $flags as $flag_key => $val ) {
+					$settings->flags[ sanitize_text_field( $flag_key ) ] = array(
+						'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
+						'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 ),
+					);
+				}
 			}
 		}
 		update_option( $this->domain, $settings );
@@ -165,11 +167,11 @@ class Admin {
 	function get_flag_data() {
 		$json_file = get_template_directory() . '/beta-flags.json';
 		if ( file_exists( $json_file ) ) {
-			$flag_json = wpcom_vip_file_get_contents( $json_file );
+			$flag_json = $this->file_get_contents( $json_file );
 		} else {
-			$json_file = FF_PLUGIN_PATH . 'data/beta-flags.json';
+			$json_file = BETA_FLAGS_PLUGIN_PATH . 'data/beta-flags.json';
 			if ( file_exists( $json_file ) ) {
-				$flag_json = wpcom_vip_file_get_contents( $json_file );
+				$flag_json = $this->file_get_contents( $json_file );
 			}
 		}
 		if ( false === $flag_json ) {
@@ -183,6 +185,14 @@ class Admin {
 			return __( 'No beta flag data found in configuration file', 'beta-flags' );
 		}
 		return $flag_data->flags;
+	}
+
+	function file_get_contents( $path ) {
+		if ( function_exists( 'wpcom_vip_file_get_contents' ) ) {
+			return wpcom_vip_file_get_contents( $path );
+		} else {
+			return file_get_contents( $path ); // @codingStandardsIgnoreLine replaces VIP helper function where not available
+		}
 	}
 
 }

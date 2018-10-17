@@ -18,22 +18,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-define( 'FF_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
-define( 'FF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'BETA_FLAGS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 
-include_once FF_PLUGIN_PATH . 'classes/class-betaflags.php';
-include_once FF_PLUGIN_PATH . 'classes/class-admin.php';
+include_once BETA_FLAGS_PLUGIN_PATH . 'classes/class-betaflags.php';
+include_once BETA_FLAGS_PLUGIN_PATH . 'classes/class-admin.php';
 
-$beta_flags = new \BetaFlags\BetaFlags();
+$beta_flags_object = new \BetaFlags\BetaFlags();
 new \BetaFlags\Admin();
 
 function beta_flag_enabled( $slug ) {
-	global $beta_flags;
-	return $beta_flags->is_enabled( $slug );
-}
-
-if ( ! function_exists( 'wpcom_vip_file_get_contents' ) ) {
-	function wpcom_vip_file_get_contents( $path ) {
-		return file_get_contents( $path ); // @codingStandardsIgnoreLine replaces VIP helper function where not available
-	}
+	global $beta_flags_object;
+	return $beta_flags_object->is_enabled( $slug );
 }
