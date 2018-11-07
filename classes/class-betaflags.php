@@ -6,7 +6,16 @@ class BetaFlags {
 	public $ab_key = 'ab';
 	public $flag_settings;
 
+	public static function get_instance() {
+		static $instance = null;
+		if ( $instance === null ) {
+				$instance = new BetaFlags();
+		}
+		return $instance;
+	}
+
 	function __construct() {
+		echo 'DOG';
 		$this->flag_settings = get_option( 'beta-flags', null );
 		add_filter( 'query_vars', array( $this, 'query_vars_filter' ) );
 		add_action( 'init', array( $this, 'init' ) );
@@ -26,21 +35,20 @@ class BetaFlags {
 	* @return bool Whether the code managed by the flag should be executed or not
 	*/
 	function is_enabled( $flag_key ) {
-		if ( false === isset( $this->flag_settings->flags[ $flag_key ] ) ) {
+		if ( ! isset( $this->flag_settings->flags[ $flag_key ] ) ) {
 			return false; // flag doesn't exist so block code execution
 		}
 		$flag = $this->flag_settings->flags[ $flag_key ];
-		if ( false === isset( $flag['enabled'] ) ) {
+		if ( ! isset( $flag['enabled'] ) ) {
 			return false; // enabled flag not set so block code execution
 		}
 		if ( 1 === intval( $flag['enabled'] ) ) {
-			if ( false === isset( $flag['ab_test'] ) ) {
+			if ( ! isset( $flag['ab_test'] ) ) {
 				return true; // ab_test flag not set so allow code execution
 			}
 			return $this->is_ab_active( $flag['ab_test'] ); // flag is enabled so check A/B test status
-		} else {
-			return false; // flag is disabled in admin
 		}
+		return false; // flag is disabled in admin
 	}
 
 	/**
@@ -58,11 +66,7 @@ class BetaFlags {
 			return true; // A/B testing has been disabled for this flag
 		}
 		$ab_value = get_query_var( $this->ab_key, null );
-		if ( is_null( $ab_value ) ) {
-			return true; // ALLOW: flag enabled and no A/B test parameter in query string so allow access to the beta
-		} else {
-			return false; // BLOCK: flag enabled but A/B test parameter exists in query string so block access to the beta
-		}
+		return is_null( $ab_value );
 	}
 
 	/**
@@ -90,16 +94,17 @@ class BetaFlags {
 	}
 
 	/**
-	* Add a query string to half of all URLs affected when A/B testing is enabled for the website
+	* Add a query string to half of all URLs affected when A/B testing is enabled for the website (on front end only)
 	* @param string $url The URL of the web page
 	*
 	* @return string The revised URL with or without the A/B Testing query string
 	*/
 	function abtest_query_string( $url ) {
-		if ( 1 === $this->flag_settings->ab_test_on ) {
-			if ( 1 === wp_rand( 0, 1 ) ) {
-				$url = add_query_arg( $this->ab_key, '1', $url );
-			}
+		if ( is_admin() ) {
+			return $url;
+		}
+		if ( ( 1 === $this->flag_settings->ab_test_on ) && ( 1 === wp_rand( 0, 1 ) ) ) {
+			$url = add_query_arg( $this->ab_key, '1', $url );
 		}
 		return $url;
 	}
