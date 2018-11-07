@@ -15,7 +15,6 @@ class BetaFlags {
 	}
 
 	function __construct() {
-		echo 'DOG';
 		$this->flag_settings = get_option( 'beta-flags', null );
 		add_filter( 'query_vars', array( $this, 'query_vars_filter' ) );
 		add_action( 'init', array( $this, 'init' ) );
