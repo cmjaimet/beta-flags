@@ -1,6 +1,9 @@
 <?php
 namespace BetaFlags;
 
+/**
+* PROBLEM: URLs with query strings are automatically exempt from Batcache
+*/
 class BetaFlags {
 	public $flaglist;
 	public $ab_key = 'ab';
