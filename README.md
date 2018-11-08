@@ -4,6 +4,8 @@
 **Thanks to:** James Williams, whose plugin inspired this one
 (https://github.com/jamesrwilliams/feature-flags)
 
+* Note: A/B testing absent for now due to Batcache concerns. It will be back soon! *
+
 Beta Flags allow developers to manage the release of new features. Instead of having code execute as soon as it is deployed to the production environment. You can now wrap it in a beta flag conditional and activate it from the back end.
 
 A/B Testing works very similarly, except that instead of turning a code block on or off, they allow you to turn it on 50% of the time. This uses a slight variant on the URL used to display a post or term page, which can then be tracked in an analytics service (e.g. Adobe Omniture, Google 360).
