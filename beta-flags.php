@@ -7,8 +7,8 @@
  *
  * @wordpress-plugin
  * Plugin Name:        Beta Flags
- * Description:        Insert beta flags to activate/deactivate new features, and to A/B test them.
- * Version:            1.3.0
+ * Description:        Insert beta flags to activate/deactivate new features - A/B testing absent for now due to Batcache concerns
+ * Version:            1.4.0
  * Author:             Charles Jaimet
  * Author URI:         https://github.com/cmjaimet
  * Plugin URI:         https://wordpress.org/plugins/beta-flags/

@@ -1,8 +1,10 @@
-# Beta Flags ... now with A/B Testing!
+# Beta Flags
 **Version:** 1.3.0<br />
 **Author:** Charles Jaimet @cmjaimet
 **Thanks to:** James Williams, whose plugin inspired this one
 (https://github.com/jamesrwilliams/feature-flags)
+
+* Note: A/B testing absent for now due to Batcache concerns. It will be back soon! *
 
 Beta Flags allow developers to manage the release of new features. Instead of having code execute as soon as it is deployed to the production environment. You can now wrap it in a beta flag conditional and activate it from the back end.
 

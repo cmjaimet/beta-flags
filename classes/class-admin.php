@@ -37,7 +37,6 @@ class Admin {
 			return;
 		}
 		$message = $this->form_submit();
-		$enable_beta_testing = isset( $this->beta_flags->flag_settings->ab_test_on ) ? $this->beta_flags->flag_settings->ab_test_on : false;
 		if ( '' !== $message ) {
 			echo '<div id="message" class="updated fade">' . esc_html( $message ) . '</div>';
 		}
@@ -50,10 +49,6 @@ class Admin {
 		$this->flag_data = $flag_data;
 		$this->list_flags();
 		?>
-		<p>
-		<input type="checkbox" name="ab_test_on" value="1" <?php echo checked( $enable_beta_testing, 1, true ); ?> />
-		<?php esc_html_e( 'Enable beta testing', 'beta-flags' ); ?>
-		</p>
 		<?php submit_button(); ?>
 		</form>
 		</div>
@@ -74,7 +69,6 @@ class Admin {
 		<th><?php esc_html_e( 'Title', 'beta-flags' ); ?></th>
 		<th><?php esc_html_e( 'Key', 'beta-flags' ); ?></th>
 		<th><?php esc_html_e( 'Author', 'beta-flags' ); ?></th>
-		<th><?php esc_html_e( 'A/B Test', 'beta-flags' ); ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -82,7 +76,6 @@ class Admin {
 		$count = 0;
 		foreach ( $this->flag_data as $flag_key => $flag ) {
 			$enabled = $this->get_flag_setting( $flag_key, 'enabled' );
-			$ab_test = $this->get_flag_setting( $flag_key, 'ab_test' );
 			$class = ( 0 === $count % 2 ? 'alternate' : '' );
 			$flag->title = isset( $flag->title ) ? $flag->title : '';
 			$flag->author = isset( $flag->author ) ? $flag->author : '';
@@ -93,17 +86,16 @@ class Admin {
 			<td><?php echo esc_html( $flag->title ); ?></td>
 			<td><?php echo esc_html( $flag_key ); ?></td>
 			<td><?php echo esc_html( $flag->author ); ?></td>
-			<td><input type="checkbox" name="flags[<?php echo esc_attr( $flag_key ); ?>][ab_test]" value="1" <?php checked( $ab_test, 1, true ); ?> /></td>
 			</tr>
 			<tr class="<?php echo esc_attr( $class ); ?>">
 			<td></td>
-			<td colspan="4"><?php echo esc_html( $flag->description ); ?></td>
+			<td colspan="3"><?php echo esc_html( $flag->description ); ?></td>
 			</tr>
 			<?php
 			if ( ( '' === $flag->title ) || ( '' === $flag->author ) || ( '' === $flag->description ) ) {
 				?>
 				<tr class="<?php echo esc_attr( $class ); ?>">
-				<td colspan="5">
+				<td colspan="4">
 				<div class="updated fade">
 				<?php esc_html_e( 'Some of the fields above are empty. Please review the README file distributed with this plugin for detailed instructions.', 'beta-flags' ); ?>
 				</div>
@@ -152,7 +144,7 @@ class Admin {
 			return __( 'You are not authorized to perform that action (E314)', 'beta-flags' );
 		}
 		$settings = new \stdClass;
-		$settings->ab_test_on = isset( $_POST['ab_test_on'] ) ? 1 : 0;
+		$settings->ab_test_on = 0; // stub A/B Testing data for now until A/B testing can be rethought
 		$settings->flags = array();
 		if ( isset( $_POST['flags'] ) ) {
 			$flags = wp_unslash( $_POST['flags'] );
@@ -160,7 +152,7 @@ class Admin {
 				foreach ( $flags as $flag_key => $val ) {
 					$settings->flags[ sanitize_text_field( $flag_key ) ] = array(
 						'enabled' => ( isset( $val['enabled'] ) ? 1 : 0 ),
-						'ab_test' => ( isset( $val['ab_test'] ) ? 1 : 0 ),
+						'ab_test' => 0,
 					);
 				}
 			}
