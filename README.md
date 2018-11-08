@@ -1,4 +1,4 @@
-# Beta Flags ... now with A/B Testing!
+# Beta Flags
 **Version:** 1.3.0<br />
 **Author:** Charles Jaimet @cmjaimet
 **Thanks to:** James Williams, whose plugin inspired this one
