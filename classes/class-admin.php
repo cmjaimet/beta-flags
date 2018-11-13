@@ -42,7 +42,7 @@ class Admin {
 		}
 		?>
 		<div class="wrap">
-		<form method="post" action="<?php echo admin_url( 'tools.php?page=beta-flags' ); ?>">
+		<form method="post" action="<?php echo esc_url( admin_url( 'tools.php?page=beta-flags' ) ); ?>">
 		<div class="notice-container"></div>
 		<?php
 		wp_nonce_field( $this->nonce_name, $this->nonce_name, true, true );
